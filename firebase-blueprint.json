@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "Artwork": {
+      "title": "Artwork",
+      "description": "A piece of art in the portfolio.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "The title of the artwork." },
+        "description": { "type": "string", "description": "A detailed description of the piece." },
+        "imageUrl": { "type": "string", "format": "uri", "description": "The URL to the artwork image." },
+        "category": { "type": "string", "enum": ["Painting", "Digital Art", "Photography", "Sculpture", "Mixed Media"], "description": "The medium or category of the work." },
+        "year": { "type": "string", "description": "The year the artwork was created." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the record was created." },
+        "authorUid": { "type": "string", "description": "The UID of the user who added the artwork." }
+      },
+      "required": ["title", "description", "imageUrl", "category", "year", "createdAt", "authorUid"]
+    },
+    "ArtistInfo": {
+      "title": "ArtistInfo",
+      "description": "Information about the artist.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The name of the artist." },
+        "bio": { "type": "string", "description": "A short biography." },
+        "email": { "type": "string", "format": "email", "description": "Contact email." },
+        "phone": { "type": "string", "description": "Phone number." },
+        "instagram": { "type": "string", "description": "Instagram handle or URL." },
+        "telegram": { "type": "string", "description": "Telegram handle or URL." },
+        "profileImageUrl": { "type": "string", "format": "uri", "description": "Profile image URL." }
+      },
+      "required": ["name", "bio", "email"]
+    }
+  },
+  "firestore": {
+    "/artworks/{artworkId}": {
+      "schema": "Artwork",
+      "description": "Collection of artworks."
+    },
+    "/artistInfo/{artistId}": {
+      "schema": "ArtistInfo",
+      "description": "Global artist information (usually one document)."
+    }
+  }
+}

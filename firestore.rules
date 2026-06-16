@@ -1,0 +1,115 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: artworks
+    // Document ID: auto-generated
+    // Fields:
+    //   - title: string (required, 2-100 chars)
+    //   - description: string (required, 10-2000 chars)
+    //   - imageUrl: string (required, valid URL)
+    //   - category: string (required, enum)
+    //   - year: string (required, 4 digits)
+    //   - createdAt: timestamp (required)
+    //   - authorUid: string (required, matches creator)
+    //
+    // Collection: artistInfo
+    // Document ID: artistId (e.g., 'global')
+    // Fields:
+    //   - name: string (required, 1-100 chars)
+    //   - bio: string (required, 1-2000 chars)
+    //   - email: string (required, valid email)
+    //   - phone: string (optional)
+    //   - instagram: string (optional)
+    //   - telegram: string (optional)
+    //   - profileImageUrl: string (optional)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email in ["andy13shch@gmail.com", "semenavdeev2010@gmail.com"] && request.auth.token.email_verified == true);
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidUrl(url) {
+      return url is string && (url.matches("^https://.*") || url.matches("^http://.*"));
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidArtwork(data) {
+      let validCategories = ['Живопись', 'Рисунок', 'Скульптура', 'Цифровое искусство', 'Другое'];
+      return hasOnlyAllowedFields(['title', 'description', 'imageUrl', 'category', 'year', 'createdAt', 'authorUid']) &&
+        data.title is string && data.title.size() >= 2 && data.title.size() <= 100 &&
+        data.description is string && data.description.size() >= 10 && data.description.size() <= 2000 &&
+        isValidUrl(data.imageUrl) &&
+        data.category in validCategories &&
+        data.year is string && data.year.matches("^\\d{4}$") &&
+        data.createdAt is timestamp &&
+        data.authorUid == request.auth.uid;
+    }
+
+    function isValidArtistInfo(data) {
+      return hasOnlyAllowedFields(['name', 'bio', 'email', 'phone', 'instagram', 'telegram', 'profileImageUrl']) &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+        data.bio is string && data.bio.size() >= 1 && data.bio.size() <= 2000 &&
+        isValidEmail(data.email) &&
+        (!('phone' in data) || (data.phone is string && data.phone.size() <= 50)) &&
+        (!('instagram' in data) || (data.instagram is string && data.instagram.size() <= 200)) &&
+        (!('telegram' in data) || (data.telegram is string && data.telegram.size() <= 200)) &&
+        (!('profileImageUrl' in data) || (data.profileImageUrl == "" || isValidUrl(data.profileImageUrl)));
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /artworks/{artworkId} {
+      // Public read for portfolio
+      allow read: if true;
+      
+      allow create: if isAdmin() && isValidArtwork(request.resource.data);
+      
+      allow update: if isAdmin() && isValidArtwork(request.resource.data) &&
+        request.resource.data.authorUid == resource.data.authorUid &&
+        request.resource.data.createdAt == resource.data.createdAt;
+        
+      allow delete: if isAdmin();
+    }
+
+    match /artistInfo/{artistId} {
+      allow read: if true;
+      allow write: if isAdmin() && isValidArtistInfo(request.resource.data);
+    }
+
+    // Default deny
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

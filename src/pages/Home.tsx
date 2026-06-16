@@ -1,0 +1,110 @@
+import Gallery from "@/components/Gallery";
+import { Artwork, Category } from "@/types";
+import { CATEGORIES } from "@/constants";
+import { motion } from "motion/react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+
+interface HomeProps {
+  artworks: Artwork[];
+  loading?: boolean;
+}
+
+export default function Home({ artworks, loading }: HomeProps) {
+  const [selectedCategory, setSelectedCategory] = useState<Category | "Все">("Все");
+
+  const filteredArtworks = selectedCategory === "Все"
+    ? artworks
+    : artworks.filter(art => art.category === selectedCategory);
+
+  return (
+    <div className="flex flex-col gap-24 pb-24">
+      {/* Hero Section */}
+      <section className="relative h-[80vh] w-full overflow-hidden">
+        <motion.div
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.5 }}
+          className="absolute inset-0"
+        >
+          <img
+            src="https://images-assets.nasa.gov/image/art002e009298/art002e009298~large.jpg"
+            alt="Hero Background"
+            className="h-full w-full object-cover"
+            referrerPolicy="no-referrer"
+          />
+          <div className="absolute inset-0 bg-black/40" />
+        </motion.div>
+        
+        <div className="container relative mx-auto flex h-full flex-col items-center justify-center px-4 text-center text-white">
+          <motion.h1
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="font-serif text-6xl font-bold tracking-tighter md:text-9xl"
+          >
+            AvdeevART
+          </motion.h1>
+          <motion.p
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="mt-6 max-w-lg text-lg text-white/80"
+          >
+            Исследование границ восприятия через свет, цвет и текстуру.
+          </motion.p>
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="mt-10"
+          >
+            <Button size="lg" className="rounded-full px-8" onClick={() => {
+              document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' });
+            }}>
+              Смотреть работы
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      <div id="portfolio" className="container mx-auto px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-24 text-center"
+        >
+          <h2 className="font-serif text-6xl font-bold tracking-tighter md:text-9xl uppercase">
+            ПОРТФОЛИО
+          </h2>
+          <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
+            Коллекция работ, исследующих пересечение света и эмоций.
+          </p>
+        </motion.div>
+
+        <div className="mb-20 flex flex-wrap justify-center gap-6">
+          <Button
+            variant={selectedCategory === "Все" ? "default" : "outline"}
+            onClick={() => setSelectedCategory("Все")}
+            className="rounded-full px-8 py-6 text-lg"
+          >
+            Все
+          </Button>
+          {CATEGORIES.map((cat) => (
+            <Button
+              key={cat}
+              variant={selectedCategory === cat ? "default" : "outline"}
+              onClick={() => setSelectedCategory(cat)}
+              className="rounded-full px-8 py-6 text-lg"
+            >
+              {cat}
+            </Button>
+          ))}
+        </div>
+
+        <Gallery artworks={filteredArtworks} loading={loading} />
+      </div>
+    </div>
+  );
+}
