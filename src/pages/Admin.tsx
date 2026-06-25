@@ -67,16 +67,17 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md"
         >
-          <Card className="w-full max-w-md border-none shadow-2xl">
-            <CardHeader className="text-center">
+          <Card className="w-full border border-border bg-card shadow-2xl">
+            <CardHeader className="text-center space-y-2">
               <CardTitle className="font-serif text-3xl">Доступ администратора</CardTitle>
-              <CardDescription>
+              <CardDescription className="text-base">
                 Пожалуйста, войдите, чтобы управлять портфолио и профилем.
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center pb-8">
-              <Button onClick={handleLogin} className="w-full gap-2 py-6 text-lg">
+            <CardContent className="flex justify-center pb-8 px-6">
+              <Button onClick={handleLogin} className="w-full gap-3 py-6 text-lg font-medium transition-all hover:scale-[1.02]">
                 <LogIn size={20} /> Войти через Google
               </Button>
             </CardContent>
@@ -89,20 +90,27 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
   if (!isAdmin) {
     return (
       <div className="container mx-auto flex h-[80vh] items-center justify-center px-4">
-        <Card className="w-full max-w-md border-none shadow-2xl text-center">
-          <CardHeader>
-            <AlertCircle className="mx-auto h-12 w-12 text-destructive mb-4" />
-            <CardTitle className="font-serif text-2xl">Доступ запрещен</CardTitle>
-            <CardDescription>
-              У вас нет прав для доступа к панели администратора.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pb-8">
-            <Button variant="outline" onClick={handleLogout} className="w-full">
-              Выйти и попробовать другой аккаунт
-            </Button>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md"
+        >
+          <Card className="w-full border border-border bg-card shadow-2xl text-center">
+            <CardHeader className="space-y-2">
+              <AlertCircle className="mx-auto h-12 w-12 text-destructive mb-2" />
+              <CardTitle className="font-serif text-3xl">Доступ запрещен</CardTitle>
+              <CardDescription className="text-base">
+                У вас нет прав для доступа к панели администратора.
+                {user?.email && <div className="mt-2 text-sm font-semibold text-destructive">({user.email})</div>}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pb-8 px-6">
+              <Button variant="outline" onClick={handleLogout} className="w-full py-6 text-base">
+                Выйти и попробовать другой аккаунт
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
     );
   }
