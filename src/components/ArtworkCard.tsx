@@ -1,6 +1,5 @@
 import { motion } from "motion/react";
 import { Artwork } from "@/types";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 interface ArtworkCardProps {
@@ -21,7 +20,7 @@ export default function ArtworkCard({ artwork, index, onSelect }: ArtworkCardPro
       className="group cursor-pointer"
       onClick={onSelect}
     >
-      <Card className="overflow-hidden border-none shadow-none bg-transparent">
+      <div className="overflow-hidden bg-transparent flex flex-col gap-4">
         <div className="relative aspect-[4/5] overflow-hidden rounded-lg">
           <img
             src={artwork.imageUrl}
@@ -36,7 +35,7 @@ export default function ArtworkCard({ artwork, index, onSelect }: ArtworkCardPro
             </Badge>
           </div>
         </div>
-        <CardContent className="p-6 px-1">
+        <div className="px-1 py-1">
           <div className="flex items-baseline justify-between gap-4">
             <h3 className="font-serif text-3xl font-bold tracking-tighter md:text-4xl">
               {artwork.title}
@@ -46,8 +45,8 @@ export default function ArtworkCard({ artwork, index, onSelect }: ArtworkCardPro
           <p className="mt-4 text-lg text-muted-foreground/80 line-clamp-4 leading-relaxed md:text-xl">
             {artwork.description}
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 }
