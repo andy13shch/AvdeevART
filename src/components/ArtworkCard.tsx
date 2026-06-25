@@ -6,10 +6,11 @@ import { Badge } from "@/components/ui/badge";
 interface ArtworkCardProps {
   artwork: Artwork;
   index: number;
+  onSelect?: () => void;
   key?: string | number;
 }
 
-export default function ArtworkCard({ artwork, index }: ArtworkCardProps) {
+export default function ArtworkCard({ artwork, index, onSelect }: ArtworkCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -18,6 +19,7 @@ export default function ArtworkCard({ artwork, index }: ArtworkCardProps) {
       transition={{ delay: index * 0.1 }}
       whileHover={{ y: -5 }}
       className="group cursor-pointer"
+      onClick={onSelect}
     >
       <Card className="overflow-hidden border-none shadow-none bg-transparent">
         <div className="relative aspect-[4/5] overflow-hidden rounded-lg">
