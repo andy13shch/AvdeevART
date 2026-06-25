@@ -11,9 +11,9 @@ interface LayoutProps {
 
 export default function Layout({ artistInfo }: LayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col overflow-x-hidden max-w-full">
       <Navbar />
-      <main className="flex-1">
+      <main className="flex-1 w-full max-w-full overflow-x-hidden">
         <ErrorBoundary>
           <Outlet />
         </ErrorBoundary>

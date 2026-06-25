@@ -103,7 +103,7 @@ export default function Gallery({ artworks, loading }: GalleryProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/50 backdrop-blur-md cursor-zoom-out"
+              className="absolute inset-0 bg-zinc-100/80 backdrop-blur-md cursor-zoom-out"
               onClick={() => setSelectedArtworkIndex(null)}
             />
 
@@ -142,11 +142,11 @@ export default function Gallery({ artworks, loading }: GalleryProps) {
               className="relative w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-12 z-40"
             >
               <div 
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch bg-white border border-zinc-200 rounded-2xl overflow-hidden p-6 md:p-10 lg:p-12 shadow-2xl max-h-[90vh] overflow-y-auto lg:overflow-hidden"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-0 items-stretch bg-white border border-zinc-200 rounded-2xl overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto lg:overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Image display */}
-                <div className="lg:col-span-7 flex items-center justify-center bg-zinc-50 rounded-xl overflow-hidden p-6 min-h-[250px] sm:min-h-[350px] lg:min-h-[500px]">
+                <div className="lg:col-span-7 flex items-center justify-center bg-zinc-50 min-h-[250px] sm:min-h-[350px] lg:min-h-[500px] overflow-hidden">
                   <motion.img
                     key={currentArtwork.id}
                     initial={{ opacity: 0, scale: 0.98 }}
@@ -154,13 +154,13 @@ export default function Gallery({ artworks, loading }: GalleryProps) {
                     transition={{ duration: 0.25 }}
                     src={currentArtwork.imageUrl}
                     alt={currentArtwork.title}
-                    className="max-h-[45vh] md:max-h-[55vh] lg:max-h-[70vh] w-full object-contain rounded-lg shadow-lg"
+                    className="max-h-[45vh] md:max-h-[55vh] lg:max-h-[75vh] w-full object-contain"
                     referrerPolicy="no-referrer"
                   />
                 </div>
 
                 {/* Metadata & Description */}
-                <div className="lg:col-span-5 flex flex-col justify-between py-2 text-zinc-900">
+                <div className="lg:col-span-5 flex flex-col justify-between p-6 md:p-10 lg:p-12 text-zinc-900">
                   <div>
                     <div className="flex items-center justify-between gap-4 mb-4">
                       <Badge variant="secondary" className="bg-zinc-100 text-zinc-800 border border-zinc-200 hover:bg-zinc-200">
