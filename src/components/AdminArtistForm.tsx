@@ -27,6 +27,9 @@ const formSchema = z.object({
   instagram: z.string().optional(),
   telegram: z.string().optional(),
   profileImageUrl: z.string().url({ message: "Некорректная ссылка на изображение." }).optional().or(z.literal("")),
+  homeHeroBgUrl: z.string().url({ message: "Некорректная ссылка на изображение." }).optional().or(z.literal("")),
+  homeHeroSubtitle: z.string().optional(),
+  homePortfolioSubtitle: z.string().optional(),
 });
 
 interface AdminArtistFormProps {
@@ -46,6 +49,9 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
       instagram: artistInfo.instagram || "",
       telegram: artistInfo.telegram || "",
       profileImageUrl: artistInfo.profileImageUrl || "",
+      homeHeroBgUrl: artistInfo.homeHeroBgUrl || "",
+      homeHeroSubtitle: artistInfo.homeHeroSubtitle || "",
+      homePortfolioSubtitle: artistInfo.homePortfolioSubtitle || "",
     },
   });
 
@@ -136,6 +142,60 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
                 </FormItem>
               )}
             />
+
+            <div className="border-t border-border pt-6 mt-6">
+              <h3 className="text-lg font-medium font-serif mb-4 flex items-center gap-2">
+                <ImageIcon size={18} /> Настройки главной страницы
+              </h3>
+              
+              <div className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="homeHeroBgUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        URL фонового изображения (Home Hero Background)
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://images-assets.nasa.gov/image/..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="homeHeroSubtitle"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Подзаголовок под названием сайта (Home Subtitle)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Исследование границ восприятия через свет..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="homePortfolioSubtitle"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Текст под надписью "Портфолио"</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Коллекция работ, исследующих пересечение света..." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <FormField

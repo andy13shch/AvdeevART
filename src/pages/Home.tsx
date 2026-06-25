@@ -1,5 +1,5 @@
 import Gallery from "@/components/Gallery";
-import { Artwork, Category } from "@/types";
+import { Artwork, Category, ArtistInfo } from "@/types";
 import { CATEGORIES } from "@/constants";
 import { motion } from "motion/react";
 import { useState } from "react";
@@ -8,10 +8,15 @@ import { Button } from "@/components/ui/button";
 interface HomeProps {
   artworks: Artwork[];
   loading?: boolean;
+  artistInfo?: ArtistInfo;
 }
 
-export default function Home({ artworks, loading }: HomeProps) {
+export default function Home({ artworks, loading, artistInfo }: HomeProps) {
   const [selectedCategory, setSelectedCategory] = useState<Category | "Все">("Все");
+
+  const heroBg = artistInfo?.homeHeroBgUrl || "https://images-assets.nasa.gov/image/art002e009298/art002e009298~large.jpg";
+  const heroSubtitle = artistInfo?.homeHeroSubtitle || "Исследование границ восприятия через свет, цвет и текстуру.";
+  const portfolioSubtitle = artistInfo?.homePortfolioSubtitle || "Коллекция работ, исследующих пересечение света и эмоций.";
 
   const filteredArtworks = selectedCategory === "Все"
     ? artworks
@@ -28,7 +33,7 @@ export default function Home({ artworks, loading }: HomeProps) {
           className="absolute inset-0"
         >
           <img
-            src="https://images-assets.nasa.gov/image/art002e009298/art002e009298~large.jpg"
+            src={heroBg}
             alt="Hero Background"
             className="h-full w-full object-cover"
             referrerPolicy="no-referrer"
@@ -51,7 +56,7 @@ export default function Home({ artworks, loading }: HomeProps) {
             transition={{ delay: 0.8 }}
             className="mt-6 max-w-lg text-lg text-white/80"
           >
-            Исследование границ восприятия через свет, цвет и текстуру.
+            {heroSubtitle}
           </motion.p>
           <motion.div
             initial={{ y: 20, opacity: 0 }}
@@ -79,7 +84,7 @@ export default function Home({ artworks, loading }: HomeProps) {
             ПОРТФОЛИО
           </h2>
           <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
-            Коллекция работ, исследующих пересечение света и эмоций.
+            {portfolioSubtitle}
           </p>
         </motion.div>
 

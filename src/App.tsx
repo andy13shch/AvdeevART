@@ -64,7 +64,7 @@ export default function App() {
     <Router>
       <Routes>
         <Route element={<Layout artistInfo={artistInfo} />}>
-          <Route path="/" element={<Home artworks={artworks} loading={loading} />} />
+          <Route path="/" element={<Home artworks={artworks} loading={loading} artistInfo={artistInfo} />} />
           <Route path="/about" element={<About artistInfo={artistInfo} />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin" element={<Admin artworks={artworks} artistInfo={artistInfo} user={user} />} />

@@ -16,6 +16,9 @@ export interface ArtistInfo {
   instagram?: string;
   telegram?: string;
   profileImageUrl?: string;
+  homeHeroBgUrl?: string;
+  homeHeroSubtitle?: string;
+  homePortfolioSubtitle?: string;
 }
 
 export type Category = 'Живопись' | 'Рисунок' | 'Скульптура' | 'Цифровое искусство' | 'Другое';

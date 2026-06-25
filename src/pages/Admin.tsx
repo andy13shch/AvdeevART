@@ -29,7 +29,12 @@ interface AdminProps {
 
 export default function Admin({ artworks, artistInfo, user }: AdminProps) {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const adminEmails = ["andy13shch@gmail.com", "semenavdeev2010@gmail.com"];
+  const adminEmails = [
+    "andy13shch@gmail.com",
+    "semenavdeev2010@gmail.com",
+    "aaavdeeva13@yandex.ru",
+    "aaavdeeva2013@gmail.com"
+  ];
   const isAdmin = user?.email && adminEmails.includes(user.email);
 
   const handleLogin = async () => {
@@ -63,21 +68,23 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
 
   if (!user) {
     return (
-      <div className="container mx-auto flex h-[80vh] items-center justify-center px-4">
+      <div className="container mx-auto flex min-h-[80vh] pt-24 pb-12 items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md"
+          className="w-full max-w-lg"
         >
-          <Card className="w-full border border-border bg-card shadow-2xl">
-            <CardHeader className="text-center space-y-2">
-              <CardTitle className="font-serif text-3xl">Доступ администратора</CardTitle>
-              <CardDescription className="text-base">
+          <Card className="w-full border border-border bg-card shadow-2xl p-4 sm:p-6">
+            <CardHeader className="text-center space-y-3">
+              <CardTitle className="font-serif text-2xl sm:text-3xl tracking-tight leading-normal">
+                Доступ администратора
+              </CardTitle>
+              <CardDescription className="text-sm sm:text-base text-muted-foreground">
                 Пожалуйста, войдите, чтобы управлять портфолио и профилем.
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex justify-center pb-8 px-6">
-              <Button onClick={handleLogin} className="w-full gap-3 py-6 text-lg font-medium transition-all hover:scale-[1.02]">
+            <CardContent className="flex justify-center pb-6 pt-2 px-6">
+              <Button onClick={handleLogin} className="w-full gap-3 py-6 text-base sm:text-lg font-medium transition-all hover:scale-[1.02]">
                 <LogIn size={20} /> Войти через Google
               </Button>
             </CardContent>
@@ -89,22 +96,28 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
 
   if (!isAdmin) {
     return (
-      <div className="container mx-auto flex h-[80vh] items-center justify-center px-4">
+      <div className="container mx-auto flex min-h-[80vh] pt-24 pb-12 items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md"
+          className="w-full max-w-lg"
         >
-          <Card className="w-full border border-border bg-card shadow-2xl text-center">
-            <CardHeader className="space-y-2">
+          <Card className="w-full border border-border bg-card shadow-2xl text-center p-4 sm:p-6">
+            <CardHeader className="space-y-3">
               <AlertCircle className="mx-auto h-12 w-12 text-destructive mb-2" />
-              <CardTitle className="font-serif text-3xl">Доступ запрещен</CardTitle>
-              <CardDescription className="text-base">
+              <CardTitle className="font-serif text-2xl sm:text-3xl tracking-tight leading-normal">
+                Доступ запрещен
+              </CardTitle>
+              <CardDescription className="text-sm sm:text-base text-muted-foreground">
                 У вас нет прав для доступа к панели администратора.
-                {user?.email && <div className="mt-2 text-sm font-semibold text-destructive">({user.email})</div>}
+                {user?.email && (
+                  <div className="mt-3 text-sm font-semibold text-destructive bg-destructive/10 py-1.5 px-3 rounded-md inline-block">
+                    {user.email}
+                  </div>
+                )}
               </CardDescription>
             </CardHeader>
-            <CardContent className="pb-8 px-6">
+            <CardContent className="pb-6 pt-2 px-6">
               <Button variant="outline" onClick={handleLogout} className="w-full py-6 text-base">
                 Выйти и попробовать другой аккаунт
               </Button>
@@ -116,7 +129,7 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 pt-24 pb-12">
       <div className="mb-12 flex items-center justify-between">
         <div>
           <h1 className="font-serif text-4xl font-bold tracking-tighter">

@@ -39,7 +39,12 @@ service cloud.firestore {
 
     function isAdmin() {
       return isAuthenticated() && 
-        (request.auth.token.email in ["andy13shch@gmail.com", "semenavdeev2010@gmail.com"] && request.auth.token.email_verified == true);
+        (request.auth.token.email in [
+          "andy13shch@gmail.com", 
+          "semenavdeev2010@gmail.com", 
+          "aaavdeeva13@yandex.ru", 
+          "aaavdeeva2013@gmail.com"
+        ] && request.auth.token.email_verified == true);
     }
 
     function isOwner(userId) {
@@ -75,14 +80,20 @@ service cloud.firestore {
     }
 
     function isValidArtistInfo(data) {
-      return hasOnlyAllowedFields(['name', 'bio', 'email', 'phone', 'instagram', 'telegram', 'profileImageUrl']) &&
+      return hasOnlyAllowedFields([
+        'name', 'bio', 'email', 'phone', 'instagram', 'telegram', 'profileImageUrl',
+        'homeHeroBgUrl', 'homeHeroSubtitle', 'homePortfolioSubtitle'
+      ]) &&
         data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
         data.bio is string && data.bio.size() >= 1 && data.bio.size() <= 2000 &&
         isValidEmail(data.email) &&
         (!('phone' in data) || (data.phone is string && data.phone.size() <= 50)) &&
         (!('instagram' in data) || (data.instagram is string && data.instagram.size() <= 200)) &&
         (!('telegram' in data) || (data.telegram is string && data.telegram.size() <= 200)) &&
-        (!('profileImageUrl' in data) || (data.profileImageUrl == "" || isValidUrl(data.profileImageUrl)));
+        (!('profileImageUrl' in data) || (data.profileImageUrl == "" || isValidUrl(data.profileImageUrl))) &&
+        (!('homeHeroBgUrl' in data) || (data.homeHeroBgUrl == "" || isValidUrl(data.homeHeroBgUrl))) &&
+        (!('homeHeroSubtitle' in data) || (data.homeHeroSubtitle is string && data.homeHeroSubtitle.size() <= 500)) &&
+        (!('homePortfolioSubtitle' in data) || (data.homePortfolioSubtitle is string && data.homePortfolioSubtitle.size() <= 500));
     }
 
     // ===============================================================
