@@ -46,7 +46,7 @@ export default function Home({ artworks, loading, artistInfo }: HomeProps) {
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="font-serif text-6xl font-bold tracking-tighter md:text-9xl"
+            className="font-serif text-4xl xs:text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter"
           >
             AvdeevART
           </motion.h1>
@@ -80,7 +80,7 @@ export default function Home({ artworks, loading, artistInfo }: HomeProps) {
           viewport={{ once: true }}
           className="mb-24 text-center"
         >
-          <h2 className="font-serif text-6xl font-bold tracking-tighter md:text-9xl uppercase">
+          <h2 className="font-serif text-4xl xs:text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter uppercase">
             ПОРТФОЛИО
           </h2>
           <p className="mt-6 text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -88,11 +88,11 @@ export default function Home({ artworks, loading, artistInfo }: HomeProps) {
           </p>
         </motion.div>
 
-        <div className="mb-20 flex flex-wrap justify-center gap-6">
+        <div className="mb-20 flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6">
           <Button
             variant={selectedCategory === "Все" ? "default" : "outline"}
             onClick={() => setSelectedCategory("Все")}
-            className="rounded-full px-8 py-6 text-lg"
+            className="rounded-full px-5 py-4 text-sm md:px-8 md:py-6 md:text-lg"
           >
             Все
           </Button>
@@ -101,7 +101,7 @@ export default function Home({ artworks, loading, artistInfo }: HomeProps) {
               key={cat}
               variant={selectedCategory === cat ? "default" : "outline"}
               onClick={() => setSelectedCategory(cat)}
-              className="rounded-full px-8 py-6 text-lg"
+              className="rounded-full px-5 py-4 text-sm md:px-8 md:py-6 md:text-lg"
             >
               {cat}
             </Button>

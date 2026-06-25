@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ArtistInfo } from "@/types";
-import { Save, User, Mail, Phone, Instagram, Send, Image as ImageIcon } from "lucide-react";
+import { Save, User, Mail, Phone, Instagram, Send, Image as ImageIcon, RotateCcw } from "lucide-react";
 import { updateArtistInfo } from "@/services/firebaseService";
 import { useState } from "react";
 
@@ -154,12 +154,28 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
                   name="homeHeroBgUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        URL фонового изображения (Home Hero Background)
+                      <FormLabel className="flex items-center justify-between gap-2">
+                        <span>URL фонового изображения (Home Hero Background)</span>
                       </FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://images-assets.nasa.gov/image/..." {...field} />
-                      </FormControl>
+                      <div className="flex gap-2">
+                        <FormControl>
+                          <Input placeholder="https://images-assets.nasa.gov/image/..." {...field} />
+                        </FormControl>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            field.onChange("https://images-assets.nasa.gov/image/art002e009298/art002e009298~large.jpg");
+                            toast.info("Восстановлен фоновый рисунок по умолчанию. Не забудьте сохранить изменения.");
+                          }}
+                          className="gap-1 px-3"
+                          title="Вернуть по умолчанию"
+                        >
+                          <RotateCcw size={14} />
+                          <span className="hidden sm:inline">Вернуть</span>
+                        </Button>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -172,9 +188,25 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Подзаголовок под названием сайта (Home Subtitle)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Исследование границ восприятия через свет..." {...field} />
-                        </FormControl>
+                        <div className="flex gap-2">
+                          <FormControl>
+                            <Input placeholder="Исследование границ восприятия через свет..." {...field} />
+                          </FormControl>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              field.onChange("Исследование границ восприятия через свет, цвет и текстуру.");
+                              toast.info("Восстановлен подзаголовок сайта по умолчанию. Не забудьте сохранить изменения.");
+                            }}
+                            className="gap-1 px-3"
+                            title="Вернуть по умолчанию"
+                          >
+                            <RotateCcw size={14} />
+                            <span className="hidden sm:inline">Вернуть</span>
+                          </Button>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -186,9 +218,25 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Текст под надписью "Портфолио"</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Коллекция работ, исследующих пересечение света..." {...field} />
-                        </FormControl>
+                        <div className="flex gap-2">
+                          <FormControl>
+                            <Input placeholder="Коллекция работ, исследующих пересечение света..." {...field} />
+                          </FormControl>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              field.onChange("Коллекция работ, исследующих пересечение света и эмоций.");
+                              toast.info("Восстановлено описание портфолио по умолчанию. Не забудьте сохранить изменения.");
+                            }}
+                            className="gap-1 px-3"
+                            title="Вернуть по умолчанию"
+                          >
+                            <RotateCcw size={14} />
+                            <span className="hidden sm:inline">Вернуть</span>
+                          </Button>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
