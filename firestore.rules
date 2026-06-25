@@ -52,7 +52,7 @@ service cloud.firestore {
     }
 
     function isValidEmail(email) {
-      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+      return email is string && email.size() >= 3 && email.size() <= 100 && email.matches("^.+@.+$");
     }
 
     function isValidUrl(url) {
@@ -60,7 +60,7 @@ service cloud.firestore {
     }
 
     function hasOnlyAllowedFields(fields) {
-      return request.resource.data.keys().hasOnly(fields);
+      return request.resource.data.diff({}).affectedKeys().hasOnly(fields);
     }
 
     // ===============================================================
