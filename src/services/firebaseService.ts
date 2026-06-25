@@ -15,10 +15,11 @@ import {
   handleFirestoreError,
   OperationType
 } from "@/firebase";
-import { Artwork, ArtistInfo } from "@/types";
+import { Artwork, ArtistInfo, ContactMessage } from "@/types";
 
 const ARTWORKS_COLLECTION = "artworks";
 const ARTIST_INFO_DOC = "artistInfo/main";
+const MESSAGES_COLLECTION = "messages";
 
 export function subscribeToArtworks(callback: (artworks: Artwork[]) => void) {
   const q = query(collection(db, ARTWORKS_COLLECTION), orderBy("createdAt", "desc"));
@@ -88,5 +89,44 @@ export async function updateArtistInfo(info: ArtistInfo) {
     await setDoc(doc(db, ARTIST_INFO_DOC), info);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, ARTIST_INFO_DOC);
+  }
+}
+
+export async function addMessage(message: Omit<ContactMessage, "id" | "createdAt">) {
+  try {
+    await addDoc(collection(db, MESSAGES_COLLECTION), {
+      ...message,
+      createdAt: serverTimestamp(),
+    });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.CREATE, MESSAGES_COLLECTION);
+    throw error;
+  }
+}
+
+export function subscribeToMessages(callback: (messages: ContactMessage[]) => void) {
+  if (!auth.currentUser) throw new Error("Authentication required");
+
+  const q = query(collection(db, MESSAGES_COLLECTION), orderBy("createdAt", "desc"));
+  return onSnapshot(q, (snapshot) => {
+    const messages = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: (doc.data().createdAt as any)?.toDate?.()?.toISOString() || new Date().toISOString()
+    })) as ContactMessage[];
+    callback(messages);
+  }, (error) => {
+    handleFirestoreError(error, OperationType.LIST, MESSAGES_COLLECTION);
+  });
+}
+
+export async function deleteMessage(id: string) {
+  if (!auth.currentUser) throw new Error("Authentication required");
+
+  try {
+    await deleteDoc(doc(db, MESSAGES_COLLECTION, id));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, `${MESSAGES_COLLECTION}/${id}`);
+    throw error;
   }
 }

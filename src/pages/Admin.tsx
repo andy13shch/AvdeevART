@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { auth, signIn, logout } from "@/firebase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Artwork, ArtistInfo } from "@/types";
-import { LogIn, LogOut, Image as ImageIcon, User, Trash2, AlertCircle } from "lucide-react";
+import { Artwork, ArtistInfo, ContactMessage } from "@/types";
+import { LogIn, LogOut, Image as ImageIcon, User, Trash2, AlertCircle, Mail, Calendar } from "lucide-react";
 import AdminArtworkForm from "@/components/AdminArtworkForm";
 import AdminArtistForm from "@/components/AdminArtistForm";
 import { motion, AnimatePresence } from "motion/react";
-import { deleteArtwork } from "@/services/firebaseService";
+import { deleteArtwork, subscribeToMessages, deleteMessage } from "@/services/firebaseService";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -29,6 +29,7 @@ interface AdminProps {
 
 export default function Admin({ artworks, artistInfo, user }: AdminProps) {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ContactMessage[]>([]);
   const adminEmails = [
     "andy13shch@gmail.com",
     "semenavdeev2010@gmail.com",
@@ -36,6 +37,23 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
     "aaavdeeva2013@gmail.com"
   ];
   const isAdmin = user?.email && adminEmails.includes(user.email);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    const unsubscribe = subscribeToMessages((msgs) => {
+      setMessages(msgs);
+    });
+    return () => unsubscribe();
+  }, [isAdmin]);
+
+  const handleDeleteMessage = async (id: string) => {
+    try {
+      await deleteMessage(id);
+      toast.success("Сообщение успешно удалено.");
+    } catch (error) {
+      toast.error("Не удалось удалить сообщение.");
+    }
+  };
 
   const handleLogin = async () => {
     try {
@@ -145,12 +163,20 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
       </div>
 
       <Tabs defaultValue="artworks" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md mb-8">
+        <TabsList className="grid w-full grid-cols-3 max-w-lg mb-8">
           <TabsTrigger value="artworks" className="gap-2">
             <ImageIcon size={16} /> Работы
           </TabsTrigger>
           <TabsTrigger value="profile" className="gap-2">
-            <User size={16} /> Профиль художника
+            <User size={16} /> Профиль
+          </TabsTrigger>
+          <TabsTrigger value="messages" className="gap-2">
+            <Mail size={16} /> Сообщения
+            {messages.length > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 text-[10px] font-bold bg-primary text-primary-foreground rounded-full leading-none">
+                {messages.length}
+              </span>
+            )}
           </TabsTrigger>
         </TabsList>
 
@@ -211,6 +237,77 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
               exit={{ opacity: 0, y: -10 }}
             >
               <AdminArtistForm artistInfo={artistInfo} />
+            </motion.div>
+          </TabsContent>
+
+          <TabsContent value="messages">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-6"
+            >
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-semibold">Входящие сообщения</h2>
+                <span className="text-sm text-muted-foreground bg-secondary px-3 py-1 rounded-full">
+                  Всего: {messages.length}
+                </span>
+              </div>
+
+              {messages.length === 0 ? (
+                <Card className="p-8 text-center border-dashed border-2">
+                  <Mail className="mx-auto h-12 w-12 text-muted-foreground/50 mb-3" />
+                  <CardTitle className="text-lg font-medium mb-1">Нет новых сообщений</CardTitle>
+                  <CardDescription>
+                    Когда пользователи отправят сообщения через форму контактов, они появятся здесь.
+                  </CardDescription>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 gap-6">
+                  {messages.map((msg) => (
+                    <Card key={msg.id} className="border border-border shadow-sm hover:shadow-md transition-all">
+                      <CardHeader className="flex flex-col md:flex-row md:items-center justify-between pb-3 gap-4">
+                        <div className="space-y-1">
+                          <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-muted text-muted-foreground uppercase tracking-wider">
+                            Тема: {msg.subject}
+                          </span>
+                          <CardTitle className="text-lg font-serif mt-2">
+                            {msg.name}
+                          </CardTitle>
+                          <div className="text-sm text-primary hover:underline">
+                            <a href={`mailto:${msg.email}`}>{msg.email}</a>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground self-start md:self-center">
+                          <span className="flex items-center gap-1">
+                            <Calendar size={14} />
+                            {new Date(msg.createdAt).toLocaleString("ru-RU", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => handleDeleteMessage(msg.id)}
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-2 border-t border-border bg-muted/20">
+                        <p className="text-sm text-foreground/90 whitespace-pre-line leading-relaxed">
+                          {msg.message}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </motion.div>
           </TabsContent>
         </AnimatePresence>

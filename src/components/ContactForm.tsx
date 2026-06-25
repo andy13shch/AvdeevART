@@ -14,6 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { motion } from "motion/react";
+import { useState } from "react";
+import { addMessage } from "@/services/firebaseService";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Имя должно содержать не менее 2 символов." }),
@@ -23,6 +26,7 @@ const formSchema = z.object({
 });
 
 export default function ContactForm() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -33,12 +37,22 @@ export default function ContactForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast.success("Сообщение успешно отправлено!", {
-      description: "Художник свяжется с вами в ближайшее время.",
-    });
-    form.reset();
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    try {
+      await addMessage(values);
+      toast.success("Сообщение успешно отправлено!", {
+        description: "Художник свяжется с вами в ближайшее время.",
+      });
+      form.reset();
+    } catch (error) {
+      console.error(error);
+      toast.error("Ошибка при отправке сообщения", {
+        description: "Пожалуйста, попробуйте еще раз позже.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -108,8 +122,9 @@ export default function ContactForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full md:w-auto px-12">
-            Отправить сообщение
+          <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto px-12 gap-2">
+            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isSubmitting ? "Отправка..." : "Отправить сообщение"}
           </Button>
         </form>
       </Form>

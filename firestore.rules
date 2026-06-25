@@ -96,6 +96,15 @@ service cloud.firestore {
         (!('homePortfolioSubtitle' in data) || (data.homePortfolioSubtitle is string && data.homePortfolioSubtitle.size() <= 500));
     }
 
+    function isValidMessage(data) {
+      return hasOnlyAllowedFields(['name', 'email', 'subject', 'message', 'createdAt']) &&
+        data.name is string && data.name.size() >= 2 && data.name.size() <= 100 &&
+        isValidEmail(data.email) &&
+        data.subject is string && data.subject.size() >= 5 && data.subject.size() <= 200 &&
+        data.message is string && data.message.size() >= 10 && data.message.size() <= 5000 &&
+        data.createdAt is timestamp;
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -116,6 +125,11 @@ service cloud.firestore {
     match /artistInfo/{artistId} {
       allow read: if true;
       allow write: if isAdmin() && isValidArtistInfo(request.resource.data);
+    }
+
+    match /messages/{messageId} {
+      allow create: if isValidMessage(request.resource.data);
+      allow read, delete: if isAdmin();
     }
 
     // Default deny
