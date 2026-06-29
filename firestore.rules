@@ -68,14 +68,13 @@ service cloud.firestore {
     // ===============================================================
 
     function isValidArtwork(data) {
-      let validCategories = ['Живопись', 'Рисунок', 'Конкурсные работы'];
       return hasOnlyAllowedFields(['title', 'description', 'imageUrl', 'category', 'year', 'createdAt', 'authorUid']) &&
         data.title is string && data.title.size() >= 2 && data.title.size() <= 100 &&
-        (!('description' in data) || (data.description is string && data.description.size() <= 2000)) &&
+        (!('description' in data) || data.description is string) &&
         isValidUrl(data.imageUrl) &&
-        data.category in validCategories &&
+        data.category in ['Живопись', 'Рисунок', 'Конкурсные работы'] &&
         data.year is string && data.year.matches("^\\d{4}$") &&
-        data.createdAt is timestamp &&
+        data.createdAt != null &&
         data.authorUid == request.auth.uid;
     }
 

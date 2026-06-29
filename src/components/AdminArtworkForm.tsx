@@ -126,7 +126,7 @@ export default function AdminArtworkForm({ mode, artwork }: AdminArtworkFormProp
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Категория</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || ""}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Выберите категорию" />
