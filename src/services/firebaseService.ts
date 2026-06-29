@@ -45,12 +45,27 @@ export function subscribeToArtistInfo(callback: (info: ArtistInfo) => void) {
   });
 }
 
+function cleanArtworkData(artwork: any) {
+  const cleaned: any = {};
+  for (const [key, value] of Object.entries(artwork)) {
+    if (value !== undefined && value !== null) {
+      cleaned[key] = value;
+    }
+  }
+  // If description is not present, set it to an empty string to satisfy firestore security rules
+  if (cleaned.description === undefined) {
+    cleaned.description = "";
+  }
+  return cleaned;
+}
+
 export async function addArtwork(artwork: Omit<Artwork, "id" | "createdAt">) {
   if (!auth.currentUser) throw new Error("Authentication required");
   
   try {
+    const cleaned = cleanArtworkData(artwork);
     await addDoc(collection(db, ARTWORKS_COLLECTION), {
-      ...artwork,
+      ...cleaned,
       authorUid: auth.currentUser.uid,
       createdAt: serverTimestamp(),
     });
@@ -66,7 +81,8 @@ export async function updateArtwork(id: string, artwork: Partial<Artwork>) {
     const artworkRef = doc(db, ARTWORKS_COLLECTION, id);
     // Remove fields that shouldn't be updated manually
     const { id: _, createdAt: __, authorUid: ___, ...updateData } = artwork as any;
-    await updateDoc(artworkRef, updateData);
+    const cleaned = cleanArtworkData(updateData);
+    await updateDoc(artworkRef, cleaned);
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, `${ARTWORKS_COLLECTION}/${id}`);
   }
