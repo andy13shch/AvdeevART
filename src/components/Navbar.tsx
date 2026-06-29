@@ -59,15 +59,6 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
-          <Link to="/admin">
-            <Button
-              variant={!isScrolled && isHome ? "secondary" : "outline"}
-              size="sm"
-              className={cn(!isScrolled && isHome && "bg-white/10 text-white hover:bg-white/20 border-white/20")}
-            >
-              Админ
-            </Button>
-          </Link>
         </div>
 
         {/* Mobile Nav Toggle */}
@@ -103,9 +94,6 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
-              <Link to="/admin" onClick={() => setIsOpen(false)}>
-                <Button className="w-full py-6 text-lg">Панель управления</Button>
-              </Link>
             </div>
           </motion.div>
         )}
