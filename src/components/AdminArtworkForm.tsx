@@ -37,7 +37,7 @@ import { addArtwork, updateArtwork } from "@/services/firebaseService";
 
 const formSchema = z.object({
   title: z.string().min(2, { message: "Название должно содержать не менее 2 символов." }),
-  description: z.string().min(10, { message: "Описание должно содержать не менее 10 символов." }),
+  description: z.string().optional().or(z.literal("")),
   imageUrl: z.string().url({ message: "Некорректная ссылка на изображение." }),
   category: z.string().min(1, { message: "Пожалуйста, выберите категорию." }),
   year: z.string().regex(/^\d{4}$/, { message: "Год должен состоять из 4 цифр." }),
