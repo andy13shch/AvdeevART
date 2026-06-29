@@ -264,8 +264,8 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
                 </Card>
               ) : (
                 <div className="grid grid-cols-1 gap-6">
-                  {messages.map((msg) => (
-                    <Card key={msg.id} className="border border-border shadow-sm hover:shadow-md transition-all">
+                  {messages.map((msg, index) => (
+                    <Card key={`${msg.id}-${index}`} className="border border-border shadow-sm hover:shadow-md transition-all">
                       <CardHeader className="flex flex-col md:flex-row md:items-center justify-between pb-3 gap-4">
                         <div className="space-y-1">
                           <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-muted text-muted-foreground uppercase tracking-wider">
