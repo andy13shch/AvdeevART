@@ -33,7 +33,7 @@ export default function About({ artistInfo }: AboutProps) {
             {artistInfo.name}
           </h1>
           <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
-            <p>{artistInfo.bio}</p>
+            <p className="whitespace-pre-line">{artistInfo.bio}</p>
           </div>
         </motion.div>
       </div>
