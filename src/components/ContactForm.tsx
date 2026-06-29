@@ -14,9 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { motion } from "motion/react";
-import { useState } from "react";
-import { addMessage } from "@/services/firebaseService";
+import { useState, useEffect } from "react";
+import { addMessage, subscribeToArtistInfo } from "@/services/firebaseService";
 import { Loader2 } from "lucide-react";
+import { ArtistInfo } from "@/types";
+import emailjs from "@emailjs/browser";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Имя должно содержать не менее 2 символов." }),
@@ -27,6 +29,15 @@ const formSchema = z.object({
 
 export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [artistInfo, setArtistInfo] = useState<ArtistInfo | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToArtistInfo((data) => {
+      setArtistInfo(data);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,10 +51,47 @@ export default function ContactForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
+      // 1. Always save to Firestore so messages are never lost
       await addMessage(values);
-      toast.success("Сообщение успешно отправлено!", {
-        description: "Художник свяжется с вами в ближайшее время.",
-      });
+
+      // 2. Check if EmailJS is configured
+      const metaEnv = (import.meta as any).env || {};
+      const serviceId = artistInfo?.emailjsServiceId || metaEnv.VITE_EMAILJS_SERVICE_ID;
+      const templateId = artistInfo?.emailjsTemplateId || metaEnv.VITE_EMAILJS_TEMPLATE_ID;
+      const publicKey = artistInfo?.emailjsPublicKey || metaEnv.VITE_EMAILJS_PUBLIC_KEY;
+
+      if (serviceId && templateId && publicKey) {
+        try {
+          await emailjs.send(
+            serviceId,
+            templateId,
+            {
+              from_name: values.name,
+              name: values.name,
+              from_email: values.email,
+              email: values.email,
+              subject: values.subject,
+              message: values.message,
+              to_email: artistInfo?.email || "",
+            },
+            publicKey
+          );
+          toast.success("Сообщение отправлено и продублировано на почту!", {
+            description: "Художник свяжется с вами в ближайшее время.",
+          });
+        } catch (emailError) {
+          console.error("EmailJS Error:", emailError);
+          // If email fails but Firestore succeeded, inform the user
+          toast.success("Сообщение отправлено на сайт!", {
+            description: "Запись успешно сохранена, но возникла ошибка при дублировании на почту.",
+          });
+        }
+      } else {
+        // Fallback when EmailJS is not configured
+        toast.success("Сообщение успешно отправлено!", {
+          description: "Художник свяжется с вами в ближайшее время.",
+        });
+      }
       form.reset();
     } catch (error) {
       console.error(error);

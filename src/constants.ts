@@ -13,4 +13,7 @@ export const DEFAULT_ARTIST_INFO = {
   homeHeroBgUrl: "",
   homeHeroSubtitle: "Исследование границ восприятия через свет, цвет и текстуру.",
   homePortfolioSubtitle: "Коллекция работ, исследующих пересечение света и эмоций.",
+  emailjsServiceId: "",
+  emailjsTemplateId: "",
+  emailjsPublicKey: "",
 };

@@ -19,6 +19,9 @@ export interface ArtistInfo {
   homeHeroBgUrl?: string;
   homeHeroSubtitle?: string;
   homePortfolioSubtitle?: string;
+  emailjsServiceId?: string;
+  emailjsTemplateId?: string;
+  emailjsPublicKey?: string;
 }
 
 export type Category = string;

@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ArtistInfo } from "@/types";
-import { Save, User, Mail, Phone, Instagram, Send, Image as ImageIcon, RotateCcw } from "lucide-react";
+import { Save, User, Mail, Phone, Instagram, Send, Image as ImageIcon, RotateCcw, Shield } from "lucide-react";
 import { updateArtistInfo } from "@/services/firebaseService";
 import { useState } from "react";
 
@@ -30,6 +30,9 @@ const formSchema = z.object({
   homeHeroBgUrl: z.string().url({ message: "Некорректная ссылка на изображение." }).optional().or(z.literal("")),
   homeHeroSubtitle: z.string().optional(),
   homePortfolioSubtitle: z.string().optional(),
+  emailjsServiceId: z.string().optional(),
+  emailjsTemplateId: z.string().optional(),
+  emailjsPublicKey: z.string().optional(),
 });
 
 interface AdminArtistFormProps {
@@ -52,6 +55,9 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
       homeHeroBgUrl: artistInfo.homeHeroBgUrl || "",
       homeHeroSubtitle: artistInfo.homeHeroSubtitle || "",
       homePortfolioSubtitle: artistInfo.homePortfolioSubtitle || "",
+      emailjsServiceId: artistInfo.emailjsServiceId || "",
+      emailjsTemplateId: artistInfo.emailjsTemplateId || "",
+      emailjsPublicKey: artistInfo.emailjsPublicKey || "",
     },
   });
 
@@ -291,6 +297,64 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
                   </FormItem>
                 )}
               />
+            </div>
+
+            <div className="border-t border-border pt-6 mt-6">
+              <h3 className="text-lg font-medium font-serif mb-2 flex items-center gap-2">
+                <Mail size={18} /> Интеграция EmailJS для отправки писем
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                Позволяет отправлять сообщения из контактной формы сайта прямо на вашу личную почту.
+                Зарегистрируйтесь на <a href="https://www.emailjs.com/" target="_blank" rel="noreferrer" className="underline hover:text-primary">emailjs.com</a>, создайте Email Service и Email Template, затем укажите ключи ниже.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <FormField
+                  control={form.control}
+                  name="emailjsServiceId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        Service ID
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="service_xxxxxxx" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="emailjsTemplateId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        Template ID
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="template_xxxxxxx" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="emailjsPublicKey"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        Public Key
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="user_xxxxxxxxxxxx" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
 
             <Button type="submit" className="w-full md:w-auto gap-2 px-12" disabled={isSubmitting}>

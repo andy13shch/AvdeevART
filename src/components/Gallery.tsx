@@ -175,15 +175,15 @@ export default function Gallery({ artworks, loading }: GalleryProps) {
 
                     {/* Scrollable Description */}
                     <div className="text-zinc-600 text-base md:text-lg leading-relaxed max-h-[25vh] lg:max-h-[48vh] overflow-y-auto pr-3 flex flex-col gap-4 custom-scrollbar select-text">
-                      {(currentArtwork.description || "").split("\n").map((para, i) => {
-                        const trimmed = para.trim();
-                        if (!trimmed) return null;
-                        return (
-                          <p key={i} className="indent-8 leading-relaxed">
-                            {trimmed}
+                      {(currentArtwork.description || "")
+                        .split("\n")
+                        .map((p) => p.trim())
+                        .filter(Boolean)
+                        .map((para, i) => (
+                          <p key={`gallery-desc-para-${i}`} className="indent-8 leading-relaxed">
+                            {para}
                           </p>
-                        );
-                      })}
+                        ))}
                     </div>
                   </div>
 
