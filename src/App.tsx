@@ -17,6 +17,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [isArtistInfoLoading, setIsArtistInfoLoading] = useState(true);
 
   useEffect(() => {
     // Validate Connection to Firestore
@@ -42,7 +43,12 @@ export default function App() {
     });
 
     const unsubscribeArtist = subscribeToArtistInfo((data) => {
-      if (data) setArtistInfo(data);
+      if (data) {
+        setArtistInfo(data);
+      } else {
+        setArtistInfo(DEFAULT_ARTIST_INFO);
+      }
+      setIsArtistInfoLoading(false);
     });
 
     return () => {
@@ -52,7 +58,7 @@ export default function App() {
     };
   }, []);
 
-  if (!isAuthReady) {
+  if (!isAuthReady || isArtistInfoLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />

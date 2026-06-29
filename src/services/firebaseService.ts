@@ -35,13 +35,16 @@ export function subscribeToArtworks(callback: (artworks: Artwork[]) => void) {
   });
 }
 
-export function subscribeToArtistInfo(callback: (info: ArtistInfo) => void) {
+export function subscribeToArtistInfo(callback: (info: ArtistInfo | null) => void) {
   return onSnapshot(doc(db, ARTIST_INFO_DOC), (snapshot) => {
     if (snapshot.exists()) {
       callback(snapshot.data() as ArtistInfo);
+    } else {
+      callback(null);
     }
   }, (error) => {
     handleFirestoreError(error, OperationType.GET, ARTIST_INFO_DOC);
+    callback(null);
   });
 }
 
