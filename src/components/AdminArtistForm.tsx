@@ -118,7 +118,7 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
                   <FormControl>
                     <Textarea
                       placeholder="Расскажите свою историю..."
-                      className="min-h-[200px] resize-none"
+                      className="min-h-[200px] resize-y"
                       {...field}
                     />
                   </FormControl>
