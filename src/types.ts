@@ -1,7 +1,7 @@
 export interface Artwork {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   imageUrl: string;
   category: string;
   year: string;

@@ -8,12 +8,12 @@
         "title": { "type": "string", "description": "The title of the artwork." },
         "description": { "type": "string", "description": "A detailed description of the piece." },
         "imageUrl": { "type": "string", "format": "uri", "description": "The URL to the artwork image." },
-        "category": { "type": "string", "enum": ["Painting", "Digital Art", "Photography", "Sculpture", "Mixed Media"], "description": "The medium or category of the work." },
+        "category": { "type": "string", "enum": ["Живопись", "Рисунок", "Конкурсные работы"], "description": "The medium or category of the work." },
         "year": { "type": "string", "description": "The year the artwork was created." },
         "createdAt": { "type": "string", "format": "date-time", "description": "When the record was created." },
         "authorUid": { "type": "string", "description": "The UID of the user who added the artwork." }
       },
-      "required": ["title", "description", "imageUrl", "category", "year", "createdAt", "authorUid"]
+      "required": ["title", "imageUrl", "category", "year", "createdAt", "authorUid"]
     },
     "ArtistInfo": {
       "title": "ArtistInfo",
