@@ -14,7 +14,7 @@ interface HomeProps {
 export default function Home({ artworks, loading, artistInfo }: HomeProps) {
   const [selectedCategory, setSelectedCategory] = useState<Category | "Все">("Все");
 
-  const heroBg = artistInfo?.homeHeroBgUrl || "https://images-assets.nasa.gov/image/art002e009298/art002e009298~large.jpg";
+  const heroBg = artistInfo?.homeHeroBgUrl || "";
   const heroSubtitle = artistInfo?.homeHeroSubtitle || "Исследование границ восприятия через свет, цвет и текстуру.";
   const portfolioSubtitle = artistInfo?.homePortfolioSubtitle || "Коллекция работ, исследующих пересечение света и эмоций.";
 
@@ -25,21 +25,23 @@ export default function Home({ artworks, loading, artistInfo }: HomeProps) {
   return (
     <div className="flex flex-col gap-24 pb-24">
       {/* Hero Section */}
-      <section className="relative h-[80vh] w-full overflow-hidden">
-        <motion.div
-          initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1.5 }}
-          className="absolute inset-0"
-        >
-          <img
-            src={heroBg}
-            alt="Hero Background"
-            className="h-full w-full object-cover"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-black/40" />
-        </motion.div>
+      <section className="relative h-[80vh] w-full overflow-hidden bg-neutral-950">
+        {heroBg && (
+          <motion.div
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.5 }}
+            className="absolute inset-0"
+          >
+            <img
+              src={heroBg}
+              alt="Hero Background"
+              className="h-full w-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+            <div className="absolute inset-0 bg-black/40" />
+          </motion.div>
+        )}
         
         <div className="container relative mx-auto flex h-full flex-col items-center justify-center px-4 text-center text-white">
           <motion.h1
