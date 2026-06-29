@@ -21,7 +21,7 @@ export interface ArtistInfo {
   homePortfolioSubtitle?: string;
 }
 
-export type Category = 'Живопись' | 'Рисунок' | 'Скульптура' | 'Цифровое искусство' | 'Другое';
+export type Category = string;
 
 export interface ContactMessage {
   id: string;
