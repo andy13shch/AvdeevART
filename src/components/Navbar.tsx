@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function Navbar() {
@@ -58,6 +59,7 @@ export default function Navbar() {
               {link.name}
             </Link>
           ))}
+
         </div>
 
         {/* Mobile Nav Toggle */}
@@ -93,6 +95,7 @@ export default function Navbar() {
                   {link.name}
                 </Link>
               ))}
+
             </div>
           </motion.div>
         )}

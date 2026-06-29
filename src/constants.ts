@@ -1,9 +1,11 @@
 import { Category } from "./types";
 
 export const CATEGORIES: Category[] = [
-  'Конкурсные работы',
+  'Живопись',
   'Рисунок',
-  'Живопись'
+  'Скульптура',
+  'Цифровое искусство',
+  'Другое'
 ];
 
 export const DEFAULT_ARTIST_INFO = {
