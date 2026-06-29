@@ -32,8 +32,16 @@ export default function About({ artistInfo }: AboutProps) {
           <h1 className="font-serif text-5xl font-bold tracking-tighter md:text-7xl">
             {artistInfo.name}
           </h1>
-          <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
-            <p className="whitespace-pre-line">{artistInfo.bio}</p>
+          <div className="flex flex-col gap-4 text-lg text-muted-foreground leading-relaxed">
+            {(artistInfo.bio || "").split("\n").map((para, i) => {
+              const trimmed = para.trim();
+              if (!trimmed) return null;
+              return (
+                <p key={i} className="indent-8">
+                  {trimmed}
+                </p>
+              );
+            })}
           </div>
         </motion.div>
       </div>

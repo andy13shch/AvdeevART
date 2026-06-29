@@ -42,7 +42,7 @@ export default function ArtworkCard({ artwork, index, onSelect }: ArtworkCardPro
             </h3>
             <span className="text-base font-medium text-muted-foreground/60">{artwork.year}</span>
           </div>
-          <p className="mt-4 text-lg text-muted-foreground/80 line-clamp-4 leading-relaxed md:text-xl">
+          <p className="mt-4 text-lg text-muted-foreground/80 line-clamp-4 leading-relaxed md:text-xl indent-8 whitespace-pre-line">
             {artwork.description}
           </p>
         </div>
