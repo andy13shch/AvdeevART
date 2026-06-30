@@ -35,19 +35,12 @@ import { Plus, Edit2, Save, FolderOpen, Image as ImageIcon } from "lucide-react"
 import { useState } from "react";
 import { addArtwork, updateArtwork } from "@/services/firebaseService";
 
-// Scan /public/images folder automatically using Vite glob import
-const imageModules = (import.meta as any).glob(
-  "/public/images/**/*.{png,jpg,jpeg,webp,gif,svg,PNG,JPG,JPEG,WEBP,GIF,SVG}",
-  { eager: true }
-);
+import { LOCAL_IMAGES } from "../images-list";
 
-const localImagesList = Object.keys(imageModules)
-  .map((key) => {
-    const url = key.replace(/^\/public/, "");
-    const name = key.replace(/^\/public\/images\//, "");
-    return { name, url };
-  })
-  .filter((item) => !item.name.endsWith("readme.txt") && !item.name.endsWith(".gitkeep"));
+const localImagesList = LOCAL_IMAGES.map((filename) => ({
+  name: filename,
+  url: `/images/${filename}`,
+}));
 
 const formSchema = z.object({
   title: z.string().min(2, { message: "Название должно содержать не менее 2 символов." }),
