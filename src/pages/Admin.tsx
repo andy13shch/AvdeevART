@@ -7,6 +7,7 @@ import { Artwork, ArtistInfo, ContactMessage } from "@/types";
 import { LogIn, LogOut, Image as ImageIcon, User, Trash2, AlertCircle, Mail, Calendar } from "lucide-react";
 import AdminArtworkForm from "@/components/AdminArtworkForm";
 import AdminArtistForm from "@/components/AdminArtistForm";
+import AdminEmailJSForm from "@/components/AdminEmailJSForm";
 import { motion, AnimatePresence } from "motion/react";
 import { deleteArtwork, subscribeToMessages, deleteMessage } from "@/services/firebaseService";
 import { toast } from "sonner";
@@ -245,14 +246,17 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="space-y-6"
+              className="space-y-12"
             >
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold">Входящие сообщения</h2>
-                <span className="text-sm text-muted-foreground bg-secondary px-3 py-1 rounded-full">
-                  Всего: {messages.length}
-                </span>
-              </div>
+              <AdminEmailJSForm artistInfo={artistInfo} />
+
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-semibold">Входящие сообщения</h2>
+                  <span className="text-sm text-muted-foreground bg-secondary px-3 py-1 rounded-full">
+                    Всего: {messages.length}
+                  </span>
+                </div>
 
               {messages.length === 0 ? (
                 <Card className="p-8 text-center border-dashed border-2">
@@ -308,6 +312,7 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
                   ))}
                 </div>
               )}
+              </div>
             </motion.div>
           </TabsContent>
         </AnimatePresence>

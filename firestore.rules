@@ -86,7 +86,8 @@ service cloud.firestore {
     function isValidArtistInfo(data) {
       return hasOnlyAllowedFields([
         'name', 'bio', 'email', 'phone', 'instagram', 'telegram', 'profileImageUrl',
-        'homeHeroBgUrl', 'homeHeroSubtitle', 'homePortfolioSubtitle'
+        'homeHeroBgUrl', 'homeHeroSubtitle', 'homePortfolioSubtitle',
+        'emailjsServiceId', 'emailjsTemplateId', 'emailjsPublicKey'
       ]) &&
         data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
         data.bio is string && data.bio.size() >= 1 && data.bio.size() <= 2000 &&
@@ -97,7 +98,10 @@ service cloud.firestore {
         (!('profileImageUrl' in data) || (data.profileImageUrl == "" || isValidUrl(data.profileImageUrl))) &&
         (!('homeHeroBgUrl' in data) || (data.homeHeroBgUrl == "" || isValidUrl(data.homeHeroBgUrl))) &&
         (!('homeHeroSubtitle' in data) || (data.homeHeroSubtitle is string && data.homeHeroSubtitle.size() <= 500)) &&
-        (!('homePortfolioSubtitle' in data) || (data.homePortfolioSubtitle is string && data.homePortfolioSubtitle.size() <= 500));
+        (!('homePortfolioSubtitle' in data) || (data.homePortfolioSubtitle is string && data.homePortfolioSubtitle.size() <= 500)) &&
+        (!('emailjsServiceId' in data) || (data.emailjsServiceId is string && data.emailjsServiceId.size() <= 100)) &&
+        (!('emailjsTemplateId' in data) || (data.emailjsTemplateId is string && data.emailjsTemplateId.size() <= 100)) &&
+        (!('emailjsPublicKey' in data) || (data.emailjsPublicKey is string && data.emailjsPublicKey.size() <= 100));
     }
 
     function isValidMessage(data) {
