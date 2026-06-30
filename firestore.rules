@@ -44,7 +44,7 @@ service cloud.firestore {
           "semenavdeev2010@gmail.com", 
           "aaavdeeva13@yandex.ru", 
           "aaavdeeva2013@gmail.com"
-        ] && request.auth.token.email_verified == true);
+        ]);
     }
 
     function isOwner(userId) {
@@ -56,7 +56,12 @@ service cloud.firestore {
     }
 
     function isValidUrl(url) {
-      return url is string && (url.matches("^https://.*") || url.matches("^http://.*") || url.matches("^/images/.*"));
+      return url is string && (
+        url.matches("^https?://.*") || 
+        url.matches("^/?images/.*") || 
+        url.matches("^/?assets/.*") || 
+        url.matches("^/?public/.*")
+      );
     }
 
     function hasOnlyAllowedFields(fields) {
