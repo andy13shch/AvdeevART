@@ -31,14 +31,36 @@ import {
 import { toast } from "sonner";
 import { Artwork, Category } from "@/types";
 import { CATEGORIES } from "@/constants";
-import { Plus, Edit2, Save } from "lucide-react";
+import { Plus, Edit2, Save, FolderOpen, Image as ImageIcon } from "lucide-react";
 import { useState } from "react";
 import { addArtwork, updateArtwork } from "@/services/firebaseService";
+
+// Scan /public/images folder automatically using Vite glob import
+const imageModules = (import.meta as any).glob(
+  "/public/images/**/*.{png,jpg,jpeg,webp,gif,svg,PNG,JPG,JPEG,WEBP,GIF,SVG}",
+  { eager: true }
+);
+
+const localImagesList = Object.keys(imageModules)
+  .map((key) => {
+    const url = key.replace(/^\/public/, "");
+    const name = key.replace(/^\/public\/images\//, "");
+    return { name, url };
+  })
+  .filter((item) => !item.name.endsWith("readme.txt") && !item.name.endsWith(".gitkeep"));
 
 const formSchema = z.object({
   title: z.string().min(2, { message: "Название должно содержать не менее 2 символов." }),
   description: z.string().optional().or(z.literal("")),
-  imageUrl: z.string().url({ message: "Некорректная ссылка на изображение." }),
+  imageUrl: z.string().refine((val) => {
+    if (val.startsWith("/")) return true;
+    try {
+      new URL(val);
+      return true;
+    } catch {
+      return false;
+    }
+  }, { message: "Некорректная ссылка на изображение (укажите http/https URL или выберите локальный путь из папки)." }),
   category: z.string().min(1, { message: "Пожалуйста, выберите категорию." }),
   year: z.string().regex(/^\d{4}$/, { message: "Год должен состоять из 4 цифр." }),
 });
@@ -158,19 +180,65 @@ export default function AdminArtworkForm({ mode, artwork }: AdminArtworkFormProp
                 )}
               />
             </div>
-            <FormField
-              control={form.control}
-              name="imageUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL изображения</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://example.com/image.jpg" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+            <div className="space-y-4 border border-border/60 p-3 rounded-lg bg-muted/20">
+              {localImagesList.length > 0 && (
+                <div className="space-y-2">
+                  <FormLabel className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    <FolderOpen size={13} /> Локальные файлы в /public/images/
+                  </FormLabel>
+                  <Select
+                    onValueChange={(val) => {
+                      form.setValue("imageUrl", val, { shouldValidate: true });
+                    }}
+                    value={localImagesList.some((item) => item.url === form.watch("imageUrl")) ? form.watch("imageUrl") : ""}
+                  >
+                    <SelectTrigger className="w-full bg-background">
+                      <SelectValue placeholder="Выбрать загруженный файл..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {localImagesList.map((item) => (
+                        <SelectItem key={item.url} value={item.url}>
+                          {item.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               )}
-            />
+
+              <FormField
+                control={form.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem className="space-y-2">
+                    <FormLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      {localImagesList.length > 0 ? "Или укажите прямую ссылку (URL)" : "URL изображения"}
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://example.com/image.jpg" {...field} className="bg-background" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {form.watch("imageUrl") && (
+                <div className="space-y-1.5">
+                  <span className="text-xs text-muted-foreground">Предпросмотр:</span>
+                  <div className="relative aspect-video max-h-40 w-full rounded-md overflow-hidden border border-border bg-black/5">
+                    <img
+                      src={form.watch("imageUrl")}
+                      alt="Предпросмотр изображения"
+                      className="object-contain w-full h-full"
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
             <FormField
               control={form.control}
               name="description"
