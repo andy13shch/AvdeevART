@@ -105,7 +105,19 @@ export async function updateArtistInfo(info: ArtistInfo) {
   if (!auth.currentUser) throw new Error("Authentication required");
 
   try {
-    await setDoc(doc(db, ARTIST_INFO_DOC), info);
+    const allowedKeys = [
+      'name', 'bio', 'email', 'phone', 'instagram', 'telegram', 'profileImageUrl',
+      'homeHeroBgUrl', 'homeHeroSubtitle', 'homePortfolioSubtitle',
+      'emailjsServiceId', 'emailjsTemplateId', 'emailjsPublicKey'
+    ];
+    const cleaned: any = {};
+    for (const key of allowedKeys) {
+      const val = (info as any)[key];
+      if (val !== undefined && val !== null) {
+        cleaned[key] = val;
+      }
+    }
+    await setDoc(doc(db, ARTIST_INFO_DOC), cleaned);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, ARTIST_INFO_DOC);
   }
