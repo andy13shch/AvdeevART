@@ -94,8 +94,10 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
         ...values
       });
       toast.success("Профиль обновлен!");
-    } catch (error) {
-      toast.error("Не удалось обновить профиль.");
+    } catch (error: any) {
+      console.error("Failed to update profile:", error);
+      const msg = error instanceof Error ? error.message : String(error);
+      toast.error(`Не удалось обновить профиль: ${msg}`);
     } finally {
       setIsSubmitting(false);
     }

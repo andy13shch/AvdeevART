@@ -48,8 +48,10 @@ export default function AdminEmailJSForm({ artistInfo }: AdminEmailJSFormProps) 
         ...values,
       });
       toast.success("Настройки EmailJS успешно сохранены!");
-    } catch (error) {
-      toast.error("Не удалось сохранить настройки EmailJS.");
+    } catch (error: any) {
+      console.error("Failed to save EmailJS settings:", error);
+      const msg = error instanceof Error ? error.message : String(error);
+      toast.error(`Не удалось сохранить настройки EmailJS: ${msg}`);
     } finally {
       setIsSubmitting(false);
     }
