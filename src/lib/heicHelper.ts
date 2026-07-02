@@ -1,14 +1,82 @@
 import { useState, useEffect } from "react";
-import heic2any from "heic2any";
+
+// Robust dynamic helper for heic2any to avoid ESM/CJS bundling issues
+async function getHeic2anyFn(): Promise<any> {
+  try {
+    // Dynamic import to avoid SSR issues and guarantee client-side loading
+    const module = await import("heic2any");
+    
+    if (module && typeof module === "object" && "default" in module) {
+      if (typeof module.default === "function") {
+        return module.default;
+      }
+      const defaultObj = module.default as any;
+      if (defaultObj && typeof defaultObj.default === "function") {
+        return defaultObj.default;
+      }
+    }
+    
+    if (typeof module === "function") {
+      return module;
+    }
+    
+    // Fallback to window global if somehow exposed there
+    if (typeof window !== "undefined" && typeof (window as any).heic2any === "function") {
+      return (window as any).heic2any;
+    }
+    
+    throw new Error("heic2any loaded but no valid function found in exports.");
+  } catch (err) {
+    console.error("Failed to dynamically import heic2any:", err);
+    throw err;
+  }
+}
 
 /**
- * Checks if a filename or URL points to a HEIC/HEIF image.
+ * Checks if a filename, URL or base64 data string points to a HEIC/HEIF image.
  */
 export function isHeic(url: string | undefined): boolean {
   if (!url) return false;
+  
+  const lower = url.toLowerCase();
+  
+  // Check if it's a data URL representing HEIC/HEIF
+  if (lower.startsWith("data:")) {
+    return (
+      lower.includes("image/heic") ||
+      lower.includes("image/heif") ||
+      lower.includes("image/octet-stream") && (lower.includes("heic") || lower.includes("heif")) ||
+      lower.includes("image/png") && (lower.includes("heic") || lower.includes("heif")) // defensive check
+    );
+  }
+  
   // Clean URL from query params if any
-  const cleanUrl = url.split("?")[0].toLowerCase();
+  const cleanUrl = url.split("?")[0];
   return cleanUrl.endsWith(".heic") || cleanUrl.endsWith(".heif");
+}
+
+/**
+ * Converts a data URL string to a Blob.
+ */
+export function dataURLtoBlob(dataurl: string): Blob {
+  try {
+    const arr = dataurl.split(',');
+    if (arr.length < 2) {
+      throw new Error("Invalid base64 Data URL format.");
+    }
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : 'image/heic';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  } catch (err) {
+    console.error("Failed to parse base64 data URL to Blob:", err);
+    throw err;
+  }
 }
 
 /**
@@ -20,13 +88,16 @@ export async function convertHeicToJpeg(file: File | Blob): Promise<Blob> {
   }
   
   try {
-    const result = await heic2any({
+    const heic2anyFn = await getHeic2anyFn();
+    
+    const result = await heic2anyFn({
       blob: file,
       toType: "image/jpeg",
-      quality: 0.8,
+      quality: 0.85,
     });
     
-    return Array.isArray(result) ? result[0] : result;
+    const outputBlob = Array.isArray(result) ? result[0] : result;
+    return outputBlob;
   } catch (error) {
     console.error("Failed to convert HEIC to JPEG:", error);
     throw error;
@@ -67,8 +138,8 @@ export async function processImageFile(file: File): Promise<string> {
 }
 
 /**
- * React hook that takes an image URL, and if it's a HEIC image, 
- * fetches and converts it to a browser-compatible JPEG Blob URL.
+ * React hook that takes an image URL (could be remote URL or base64 Data URL), 
+ * and if it's a HEIC image, fetches/parses and converts it to a browser-compatible JPEG Blob URL.
  */
 export function useHeicUrl(url: string | undefined) {
   const [resolvedUrl, setResolvedUrl] = useState<string | undefined>(url);
@@ -97,12 +168,19 @@ export function useHeicUrl(url: string | undefined) {
       setIsLoading(true);
       setError(null);
       try {
-        // Fetch the local or remote HEIC file as blob
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch HEIC image: ${response.statusText}`);
+        let blob: Blob;
+        
+        if (url.startsWith("data:")) {
+          // It's a base64 encoded HEIC string
+          blob = dataURLtoBlob(url);
+        } else {
+          // It's a remote/local URL path
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch HEIC image: ${response.statusText}`);
+          }
+          blob = await response.blob();
         }
-        const blob = await response.blob();
         
         if (!active) return;
 

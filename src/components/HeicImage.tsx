@@ -8,38 +8,42 @@ interface HeicImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   containerClassName?: string;
 }
 
-export const HeicImage: React.FC<HeicImageProps> = ({
-  src,
-  alt,
-  className,
-  fallbackUrl,
-  containerClassName,
-  ...props
-}) => {
-  const { resolvedUrl, isLoading, error } = useHeicUrl(src);
+export const HeicImage = React.forwardRef<HTMLImageElement, HeicImageProps>(
+  ({ src, alt, className, fallbackUrl, containerClassName, ...props }, ref) => {
+    const { resolvedUrl, isLoading } = useHeicUrl(src);
 
-  if (isLoading) {
+    if (isLoading) {
+      return (
+        <div 
+          className={cn(
+            "flex items-center justify-center bg-muted/20 animate-pulse", 
+            className, 
+            containerClassName
+          )}
+        >
+          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground/60" />
+        </div>
+      );
+    }
+
     return (
-      <div className={cn("flex items-center justify-center w-full h-full min-h-[100px] bg-muted/30 rounded-md", containerClassName)}>
-        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-      </div>
+      <img
+        ref={ref}
+        src={resolvedUrl || fallbackUrl}
+        alt={alt}
+        className={className}
+        onError={(e) => {
+          if (fallbackUrl && e.currentTarget.src !== fallbackUrl) {
+            e.currentTarget.src = fallbackUrl;
+          }
+          if (props.onError) {
+            props.onError(e);
+          }
+        }}
+        {...props}
+      />
     );
   }
+);
 
-  return (
-    <img
-      src={resolvedUrl || fallbackUrl}
-      alt={alt}
-      className={className}
-      onError={(e) => {
-        if (fallbackUrl && e.currentTarget.src !== fallbackUrl) {
-          e.currentTarget.src = fallbackUrl;
-        }
-        if (props.onError) {
-          props.onError(e);
-        }
-      }}
-      {...props}
-    />
-  );
-};
+HeicImage.displayName = "HeicImage";

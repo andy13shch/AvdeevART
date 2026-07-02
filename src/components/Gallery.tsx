@@ -4,6 +4,9 @@ import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { HeicImage } from "./HeicImage";
+
+const MotionHeicImage = motion(HeicImage);
 
 interface GalleryProps {
   artworks: Artwork[];
@@ -147,7 +150,7 @@ export default function Gallery({ artworks, loading }: GalleryProps) {
               >
                 {/* Image display */}
                 <div className="lg:col-span-7 flex items-center justify-center bg-zinc-50 min-h-[250px] sm:min-h-[350px] lg:min-h-[500px] overflow-hidden">
-                  <motion.img
+                  <MotionHeicImage
                     key={currentArtwork.id}
                     initial={{ opacity: 0, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
