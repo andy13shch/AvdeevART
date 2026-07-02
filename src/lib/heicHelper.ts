@@ -2,8 +2,13 @@ import { useState, useEffect } from "react";
 
 // Robust dynamic helper for heic2any to avoid ESM/CJS bundling issues
 async function getHeic2anyFn(): Promise<any> {
+  // 1. Try global window.heic2any first (from CDN script in index.html)
+  if (typeof window !== "undefined" && typeof (window as any).heic2any === "function") {
+    return (window as any).heic2any;
+  }
+
   try {
-    // Dynamic import to avoid SSR issues and guarantee client-side loading
+    // 2. Dynamic import fallback if not on window global yet
     const module = await import("heic2any");
     
     if (module && typeof module === "object" && "default" in module) {
@@ -20,14 +25,15 @@ async function getHeic2anyFn(): Promise<any> {
       return module;
     }
     
-    // Fallback to window global if somehow exposed there
+    throw new Error("heic2any loaded but no valid function found in exports.");
+  } catch (err) {
+    console.error("Failed to dynamically import heic2any fallback:", err);
+    
+    // final check of window just in case it loaded slowly
     if (typeof window !== "undefined" && typeof (window as any).heic2any === "function") {
       return (window as any).heic2any;
     }
     
-    throw new Error("heic2any loaded but no valid function found in exports.");
-  } catch (err) {
-    console.error("Failed to dynamically import heic2any:", err);
     throw err;
   }
 }
@@ -45,14 +51,19 @@ export function isHeic(url: string | undefined): boolean {
     return (
       lower.includes("image/heic") ||
       lower.includes("image/heif") ||
-      lower.includes("image/octet-stream") && (lower.includes("heic") || lower.includes("heif")) ||
-      lower.includes("image/png") && (lower.includes("heic") || lower.includes("heif")) // defensive check
+      (lower.includes("image/octet-stream") && (lower.includes("heic") || lower.includes("heif"))) ||
+      (lower.includes("image/png") && (lower.includes("heic") || lower.includes("heif"))) // defensive check
     );
   }
   
   // Clean URL from query params if any
   const cleanUrl = url.split("?")[0];
-  return cleanUrl.endsWith(".heic") || cleanUrl.endsWith(".heif");
+  if (cleanUrl.endsWith(".heic") || cleanUrl.endsWith(".heif")) {
+    return true;
+  }
+
+  // Robust check for URL containing .heic or .heif as file extension (e.g., in filename query parameters like Yandex Disk / Firebase Storage)
+  return /\.(heic|heif)(\?|&|$)/i.test(url) || /filename=.*?\.(heic|heif)/i.test(url);
 }
 
 /**
