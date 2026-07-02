@@ -27,6 +27,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
+  SelectLabel,
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Artwork, Category } from "@/types";
@@ -41,6 +43,22 @@ const localImagesList = LOCAL_IMAGES.map((filename) => ({
   name: filename,
   url: `/images/${filename}`,
 }));
+
+// Group images by folder
+const groupedImages = localImagesList.reduce((acc, item) => {
+  const parts = item.name.split('/');
+  if (parts.length > 1) {
+    const folder = parts[0];
+    const name = parts.slice(1).join('/');
+    if (!acc[folder]) acc[folder] = [];
+    acc[folder].push({ ...item, displayName: name });
+  } else {
+    const folder = "Корень";
+    if (!acc[folder]) acc[folder] = [];
+    acc[folder].push({ ...item, displayName: item.name });
+  }
+  return acc;
+}, {} as Record<string, { name: string; url: string; displayName: string }[]>);
 
 const formSchema = z.object({
   title: z.string().min(2, { message: "Название должно содержать не менее 2 символов." }),
@@ -189,10 +207,15 @@ export default function AdminArtworkForm({ mode, artwork }: AdminArtworkFormProp
                       <SelectValue placeholder="Выбрать загруженный файл..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {localImagesList.map((item) => (
-                        <SelectItem key={item.url} value={item.url}>
-                          {item.name}
-                        </SelectItem>
+                      {Object.entries(groupedImages).map(([folderName, items]) => (
+                        <SelectGroup key={folderName}>
+                          <SelectLabel className="font-semibold text-xs text-muted-foreground px-2 py-1 bg-muted/30 rounded mt-1">{folderName}</SelectLabel>
+                          {items.map((item) => (
+                            <SelectItem key={item.url} value={item.url}>
+                              {item.displayName}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
                       ))}
                     </SelectContent>
                   </Select>

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <!-- Definition for modern colors and geometric shapes -->
+  <defs>
+    <linearGradient id="warm-sunset" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F25C54" />
+      <stop offset="50%" stop-color="#F27059" />
+      <stop offset="100%" stop-color="#F4845F" />
+    </linearGradient>
+    <linearGradient id="cool-shadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2F3E46" />
+      <stop offset="100%" stop-color="#354F52" />
+    </linearGradient>
+    <linearGradient id="gold-metal" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F7B267" />
+      <stop offset="100%" stop-color="#F25C54" />
+    </linearGradient>
+  </defs>
+
+  <!-- Clean Off-white architectural backdrop -->
+  <rect width="800" height="600" fill="#F7F5F0" />
+
+  <!-- Diagonal warm background beam -->
+  <polygon points="200,-50 850,-50 650,650 0,650" fill="#F2F1E8" />
+
+  <!-- Large circle element (sun or geometric focus) -->
+  <circle cx="450" cy="220" r="160" fill="url(#warm-sunset)" opacity="0.9" />
+
+  <!-- Left Brutalist concrete slab (Cool slate blue/green) -->
+  <polygon points="80,100 240,50 240,550 80,480" fill="url(#cool-shadow)" />
+
+  <!-- Overlapping golden metallic geometric plane -->
+  <rect x="200" y="250" width="300" height="180" fill="url(#gold-metal)" rx="10" transform="rotate(-12, 350, 340)" opacity="0.95" />
+
+  <!-- Architectural tall pillar -->
+  <rect x="520" y="80" width="90" height="420" fill="#CAD2C5" rx="4" />
+  <rect x="545" y="80" width="40" height="420" fill="#84A98C" opacity="0.7" />
+
+  <!-- Dark accent geometric beam -->
+  <line x1="50" y1="420" x2="750" y2="420" stroke="#1A252C" stroke-width="8" stroke-linecap="round" />
+  
+  <!-- Subtle line art detailing -->
+  <circle cx="450" cy="220" r="180" fill="none" stroke="#2F3E46" stroke-width="1.5" stroke-dasharray="10 10" />
+  <line x1="200" y1="50" x2="200" y2="550" stroke="#F25C54" stroke-width="2" />
+  <line x1="240" y1="120" x2="520" y2="120" stroke="#2F3E46" stroke-width="1" />
+  <line x1="240" y1="180" x2="520" y2="180" stroke="#2F3E46" stroke-width="1.5" />
+
+  <!-- Decorative small colorful dots/squares -->
+  <rect x="550" y="520" width="30" height="30" fill="#F25C54" />
+  <circle cx="620" cy="535" r="15" fill="#354F52" />
+  <polygon points="120,510 140,540 100,540" fill="#F7B267" />
+</svg>
