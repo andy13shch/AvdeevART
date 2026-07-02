@@ -24,7 +24,7 @@ function generateImagesListPlugin() {
             scan(path.join(currentDir, entry.name), entryRelPath);
           } else {
             const ext = path.extname(entry.name).toLowerCase();
-            if (['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg'].includes(ext)) {
+            if (['.png', '.jpg', '.jpeg', '.webp', '.gif', '.svg', '.heic', '.heif'].includes(ext)) {
               files.push(entryRelPath);
             }
           }

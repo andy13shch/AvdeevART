@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { Artwork } from "@/types";
 import { Badge } from "@/components/ui/badge";
+import { HeicImage } from "./HeicImage";
 
 interface ArtworkCardProps {
   artwork: Artwork;
@@ -22,7 +23,7 @@ export default function ArtworkCard({ artwork, index, onSelect }: ArtworkCardPro
     >
       <div className="overflow-hidden bg-transparent flex flex-col gap-4">
         <div className="relative aspect-[4/5] overflow-hidden rounded-lg">
-          <img
+          <HeicImage
             src={artwork.imageUrl}
             alt={artwork.title}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"

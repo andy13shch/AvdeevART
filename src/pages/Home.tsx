@@ -4,6 +4,7 @@ import { CATEGORIES } from "@/constants";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { HeicImage } from "@/components/HeicImage";
 
 interface HomeProps {
   artworks: Artwork[];
@@ -33,7 +34,7 @@ export default function Home({ artworks, loading, artistInfo }: HomeProps) {
             transition={{ duration: 1.5 }}
             className="absolute inset-0"
           >
-            <img
+            <HeicImage
               src={heroBg}
               alt="Hero Background"
               className="h-full w-full object-cover"

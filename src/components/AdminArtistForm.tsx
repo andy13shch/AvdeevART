@@ -1,3 +1,4 @@
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -24,9 +25,11 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ArtistInfo } from "@/types";
-import { Save, User, Mail, Phone, Instagram, Send, Image as ImageIcon, RotateCcw, Shield, FolderOpen } from "lucide-react";
+import { Save, User, Mail, Phone, Instagram, Send, Image as ImageIcon, RotateCcw, Shield, FolderOpen, Upload, Loader2 } from "lucide-react";
 import { updateArtistInfo } from "@/services/firebaseService";
 import { useState } from "react";
+import { processImageFile } from "@/lib/heicHelper";
+import { HeicImage } from "./HeicImage";
 import { LOCAL_IMAGES } from "../images-list";
 
 const localImagesList = LOCAL_IMAGES.map((filename) => ({
@@ -87,6 +90,50 @@ interface AdminArtistFormProps {
 
 export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingProfile, setIsUploadingProfile] = useState(false);
+  const [isUploadingBg, setIsUploadingBg] = useState(false);
+
+  const handleProfileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingProfile(true);
+    try {
+      const isHeicFile = file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif");
+      if (isHeicFile) {
+        toast.info("Конвертируем HEIC в JPEG формат...");
+      }
+      const base64Url = await processImageFile(file);
+      form.setValue("profileImageUrl", base64Url, { shouldValidate: true });
+      toast.success("Фото профиля успешно загружено и подготовлено!");
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Не удалось загрузить или обработать фото.");
+    } finally {
+      setIsUploadingProfile(false);
+    }
+  };
+
+  const handleBgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingBg(true);
+    try {
+      const isHeicFile = file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif");
+      if (isHeicFile) {
+        toast.info("Конвертируем HEIC в JPEG формат...");
+      }
+      const base64Url = await processImageFile(file);
+      form.setValue("homeHeroBgUrl", base64Url, { shouldValidate: true });
+      toast.success("Фоновое изображение успешно загружено и подготовлено!");
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Не удалось загрузить или обработать фон.");
+    } finally {
+      setIsUploadingBg(false);
+    }
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -216,13 +263,30 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
                 </div>
               )}
 
+              <div className="space-y-2">
+                <FormLabel className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <Upload size={13} /> Загрузить фото профиля
+                </FormLabel>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="file"
+                    accept="image/*,.heic,.heif"
+                    onChange={handleProfileUpload}
+                    disabled={isUploadingProfile || isSubmitting}
+                    className="cursor-pointer file:text-primary file:hover:underline bg-background"
+                  />
+                  {isUploadingProfile && <Loader2 className="w-5 h-5 animate-spin text-muted-foreground shrink-0" />}
+                </div>
+                <p className="text-[10px] text-muted-foreground">Поддерживает HEIC (с iPhone), PNG, JPG, GIF</p>
+              </div>
+
               <FormField
                 control={form.control}
                 name="profileImageUrl"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
                     <FormLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      {localImagesList.length > 0 ? "Или укажите прямую ссылку (URL)" : "URL изображения профиля"}
+                      Или укажите прямую ссылку (URL)
                     </FormLabel>
                     <FormControl>
                       <Input placeholder="https://example.com/profile.jpg" {...field} className="bg-background" />
@@ -236,14 +300,11 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
                 <div className="space-y-1.5">
                   <span className="text-xs text-muted-foreground">Предпросмотр профиля:</span>
                   <div className="relative h-24 w-24 rounded-full overflow-hidden border border-border bg-black/5">
-                    <img
+                    <HeicImage
                       src={form.watch("profileImageUrl")}
                       alt="Предпросмотр профиля"
                       className="object-cover w-full h-full"
                       referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).style.display = "none";
-                      }}
                     />
                   </div>
                 </div>
@@ -291,13 +352,30 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
                     </div>
                   )}
 
+                  <div className="space-y-2">
+                    <FormLabel className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <Upload size={13} /> Загрузить фоновое изображение
+                    </FormLabel>
+                    <div className="flex items-center gap-3">
+                      <Input
+                        type="file"
+                        accept="image/*,.heic,.heif"
+                        onChange={handleBgUpload}
+                        disabled={isUploadingBg || isSubmitting}
+                        className="cursor-pointer file:text-primary file:hover:underline bg-background"
+                      />
+                      {isUploadingBg && <Loader2 className="w-5 h-5 animate-spin text-muted-foreground shrink-0" />}
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">Поддерживает HEIC (с iPhone), PNG, JPG, GIF</p>
+                  </div>
+
                   <FormField
                     control={form.control}
                     name="homeHeroBgUrl"
                     render={({ field }) => (
                       <FormItem className="space-y-2">
                         <FormLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          {localImagesList.length > 0 ? "Или укажите прямую ссылку (URL)" : "URL фонового изображения"}
+                          Или укажите прямую ссылку (URL)
                         </FormLabel>
                         <div className="flex gap-2">
                           <FormControl>
@@ -327,14 +405,11 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
                     <div className="space-y-1.5">
                       <span className="text-xs text-muted-foreground">Предпросмотр фона:</span>
                       <div className="relative aspect-video max-h-32 w-full rounded-md overflow-hidden border border-border bg-black/5">
-                        <img
+                        <HeicImage
                           src={form.watch("homeHeroBgUrl")}
                           alt="Предпросмотр фона"
                           className="object-cover w-full h-full"
                           referrerPolicy="no-referrer"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).style.display = "none";
-                          }}
                         />
                       </div>
                     </div>

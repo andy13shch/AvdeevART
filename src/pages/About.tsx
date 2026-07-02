@@ -1,5 +1,6 @@
 import { ArtistInfo } from "@/types";
 import { motion } from "motion/react";
+import { HeicImage } from "@/components/HeicImage";
 
 interface AboutProps {
   artistInfo: ArtistInfo;
@@ -15,8 +16,8 @@ export default function About({ artistInfo }: AboutProps) {
           viewport={{ once: true }}
           className="relative aspect-square overflow-hidden rounded-2xl"
         >
-          <img
-            src={artistInfo.profileImageUrl || "https://picsumhttps://downloader.disk.yandex.ru/preview/bbeb103f3458ece9af24cf9ef7a14314bb9a42fdefacec4dd4f6e7ca7b1aaff8/69d59607/zmcNisZjR6GKifnnbb79M0qLkRVAfA75FQE8KR0Lu4tpz07legKex1_JO6ZG_FTUdA8-7FiOTrVERFTxZD1ZoQ%3D%3D?uid=0&filename=Picture1.png&disposition=inline&hash=&limit=0&content_type=image%2Fpng&owner_uid=0&tknv=v3&size=3430x1302.photos/seed/artist/800/800"}
+          <HeicImage
+            src={artistInfo.profileImageUrl || "https://picsum.photos/seed/artist/800/800"}
             alt={artistInfo.name}
             className="h-full w-full object-cover"
             referrerPolicy="no-referrer"

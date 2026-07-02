@@ -1,3 +1,4 @@
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -33,9 +34,11 @@ import {
 import { toast } from "sonner";
 import { Artwork, Category } from "@/types";
 import { CATEGORIES } from "@/constants";
-import { Plus, Edit2, Save, FolderOpen, Image as ImageIcon } from "lucide-react";
+import { Plus, Edit2, Save, FolderOpen, Image as ImageIcon, Upload, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { addArtwork, updateArtwork } from "@/services/firebaseService";
+import { processImageFile } from "@/lib/heicHelper";
+import { HeicImage } from "./HeicImage";
 
 import { LOCAL_IMAGES } from "../images-list";
 
@@ -84,6 +87,28 @@ interface AdminArtworkFormProps {
 export default function AdminArtworkForm({ mode, artwork }: AdminArtworkFormProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const isHeicFile = file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif");
+      if (isHeicFile) {
+        toast.info("Конвертируем HEIC в JPEG формат...");
+      }
+      const base64Url = await processImageFile(file);
+      form.setValue("imageUrl", base64Url, { shouldValidate: true });
+      toast.success("Изображение успешно загружено и подготовлено!");
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Не удалось загрузить или обработать изображение.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -222,13 +247,30 @@ export default function AdminArtworkForm({ mode, artwork }: AdminArtworkFormProp
                 </div>
               )}
 
+              <div className="space-y-2">
+                <FormLabel className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <Upload size={13} /> Загрузить файл с устройства
+                </FormLabel>
+                <div className="flex items-center gap-3">
+                  <Input
+                    type="file"
+                    accept="image/*,.heic,.heif"
+                    onChange={handleFileUpload}
+                    disabled={isUploading || isSubmitting}
+                    className="cursor-pointer file:text-primary file:hover:underline bg-background"
+                  />
+                  {isUploading && <Loader2 className="w-5 h-5 animate-spin text-muted-foreground shrink-0" />}
+                </div>
+                <p className="text-[10px] text-muted-foreground">Поддерживает HEIC (с iPhone), PNG, JPG, GIF, SVG</p>
+              </div>
+
               <FormField
                 control={form.control}
                 name="imageUrl"
                 render={({ field }) => (
                   <FormItem className="space-y-2">
                     <FormLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      {localImagesList.length > 0 ? "Или укажите прямую ссылку (URL)" : "URL изображения"}
+                      Или укажите прямую ссылку (URL)
                     </FormLabel>
                     <FormControl>
                       <Input placeholder="https://example.com/image.jpg" {...field} className="bg-background" />
@@ -242,14 +284,11 @@ export default function AdminArtworkForm({ mode, artwork }: AdminArtworkFormProp
                 <div className="space-y-1.5">
                   <span className="text-xs text-muted-foreground">Предпросмотр:</span>
                   <div className="relative aspect-video max-h-40 w-full rounded-md overflow-hidden border border-border bg-black/5">
-                    <img
+                    <HeicImage
                       src={form.watch("imageUrl")}
                       alt="Предпросмотр изображения"
                       className="object-contain w-full h-full"
                       referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).style.display = "none";
-                      }}
                     />
                   </div>
                 </div>

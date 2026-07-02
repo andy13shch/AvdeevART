@@ -8,6 +8,7 @@ import { LogIn, LogOut, Image as ImageIcon, User, Trash2, AlertCircle, Mail, Cal
 import AdminArtworkForm from "@/components/AdminArtworkForm";
 import AdminArtistForm from "@/components/AdminArtistForm";
 import AdminEmailJSForm from "@/components/AdminEmailJSForm";
+import { HeicImage } from "@/components/HeicImage";
 import { motion, AnimatePresence } from "motion/react";
 import { deleteArtwork, subscribeToMessages, deleteMessage } from "@/services/firebaseService";
 import { toast } from "sonner";
@@ -198,7 +199,7 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
                 {artworks.map((artwork, index) => (
                   <Card key={`${artwork.id}-${index}`} className="overflow-hidden">
                     <div className="aspect-video overflow-hidden">
-                      <img
+                      <HeicImage
                         src={artwork.imageUrl}
                         alt={artwork.title}
                         className="h-full w-full object-cover"
