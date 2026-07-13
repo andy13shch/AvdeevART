@@ -99,7 +99,7 @@ export default function Home({ artworks, loading, artistInfo }: HomeProps) {
           >
             Все
           </Button>
-          {CATEGORIES.map((cat) => (
+          {CATEGORIES.filter(cat => cat.toLowerCase() !== "общее").map((cat) => (
             <Button
               key={cat}
               variant={selectedCategory === cat ? "default" : "outline"}
