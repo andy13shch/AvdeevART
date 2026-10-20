@@ -6,6 +6,8 @@ import { ArtistInfo, Artwork } from "./types";
 import { DEFAULT_ARTIST_INFO } from "./constants";
 import { subscribeToArtworks, subscribeToArtistInfo } from "./services/firebaseService";
 import { auth, onAuthStateChanged, User } from "./firebase";
+import { Grid } from "ldrs/react";
+import "ldrs/react/Grid.css";
 
 // Code splitting: lazy-load secondary pages so the initial landing bundle is tiny and fast
 const About = React.lazy(() => import("./pages/About"));
@@ -14,8 +16,8 @@ const Admin = React.lazy(() => import("./pages/Admin"));
 
 function PageLoader() {
   return (
-    <div className="flex min-h-[50vh] w-full items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+    <div className="flex min-h-[50vh] w-full items-center justify-center text-foreground">
+      <Grid size="45" speed="1.5" color="currentColor" />
     </div>
   );
 }
@@ -99,14 +101,8 @@ export default function App() {
 
   if (!isAuthReady || isArtistInfoLoading || !isHeroReady) {
     return (
-      <div className="flex h-screen w-full flex-col items-center justify-center bg-neutral-950 text-white select-none">
-        <div className="relative flex items-center justify-center">
-          <div className="h-16 w-16 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-          <span className="absolute font-serif text-2xl font-bold tracking-tighter">A</span>
-        </div>
-        <span className="mt-4 font-serif text-xs tracking-widest uppercase text-white/70 animate-pulse">
-          AvdeevART
-        </span>
+      <div className="flex h-screen w-full items-center justify-center text-foreground">
+        <Grid size="60" speed="1.5" color="currentColor" />
       </div>
     );
   }
