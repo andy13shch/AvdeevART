@@ -1,21 +1,35 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
-import { Button } from "@/components/ui/button";
 
 interface HeroParallax3DProps {
   title?: string;
   subtitle?: string;
+  staticImageUrl?: string;
   onExploreClick?: () => void;
 }
 
 export default function HeroParallax3D({
   title = "AvdeevART",
   subtitle = "Исследование границ восприятия через свет, цвет и текстуру.",
+  staticImageUrl = "/images/hero/hero_full_hires.jpg",
   onExploreClick,
 }: HeroParallax3DProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // References to layer DOM elements for direct 60/120fps GPU transform updates
+  // Automatic device capability check (prefers-reduced-motion, mobile touch screen)
+  const [isStatic, setIsStatic] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    // 1. Check user preference for reduced motion (accessibility/battery saver)
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return true;
+    }
+    // 2. Check for touch devices with small screens (smartphones/small tablets)
+    const isTouch = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    const isSmallScreen = window.innerWidth < 768;
+    return Boolean(isTouch && isSmallScreen);
+  });
+
+  // Layer element references for direct GPU transforms
   const bgRef = useRef<HTMLDivElement>(null);
   const houseRef = useRef<HTMLDivElement>(null);
   const hillsRef = useRef<HTMLDivElement>(null);
@@ -23,22 +37,29 @@ export default function HeroParallax3D({
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (isStatic) return;
+
     let targetX = 0;
     let targetY = 0;
     let currentX = 0;
     let currentY = 0;
     let animationFrameId: number;
     let isHovered = false;
-    let startTime = performance.now();
+    const startTime = performance.now();
+    let lastFrameTime = performance.now();
+
+    // Frame performance tracking to detect GPU overload / low FPS
+    const frameTimes: number[] = [];
+    let slowStreak = 0;
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current) return;
       isHovered = true;
       const rect = containerRef.current.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
-      const y = (e.clientY - rect.top) / rect.height - 0.5; // -0.5 to 0.5
-      targetX = x * 2; // -1 to 1
-      targetY = y * 2; // -1 to 1
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      targetX = x * 2;
+      targetY = y * 2;
     };
 
     const handleMouseLeave = () => {
@@ -55,9 +76,32 @@ export default function HeroParallax3D({
 
     const render = () => {
       const now = performance.now();
+      const delta = now - lastFrameTime;
+      lastFrameTime = now;
+
+      // Track frame times to detect struggling hardware
+      if (delta > 0 && delta < 250) {
+        frameTimes.push(delta);
+        if (frameTimes.length > 40) {
+          const avgDelta = frameTimes.reduce((a, b) => a + b, 0) / frameTimes.length;
+          // If average FPS is below ~32 fps (>31ms per frame), GPU is under load
+          if (avgDelta > 31) {
+            slowStreak++;
+            if (slowStreak >= 2) {
+              // Gracefully stop animation loop and switch to static artwork
+              setIsStatic(true);
+              return;
+            }
+          } else {
+            slowStreak = 0;
+          }
+          frameTimes.shift();
+        }
+      }
+
       const elapsed = (now - startTime) / 1000;
 
-      // When not hovered, add a very gentle ambient breathing movement
+      // Ambient breathing motion when idle
       let effectiveTargetX = targetX;
       let effectiveTargetY = targetY;
 
@@ -66,39 +110,39 @@ export default function HeroParallax3D({
         effectiveTargetY = Math.cos(elapsed * 0.5) * 0.15;
       }
 
-      // Smooth lerp (damping factor 0.06 for silkiness)
+      // Smooth lerp (damping 0.06)
       currentX += (effectiveTargetX - currentX) * 0.06;
       currentY += (effectiveTargetY - currentY) * 0.06;
 
-      // Layer 0: Background (Sky, Lake, Distant hills) - subtle reverse movement
+      // Layer 0: Background
       if (bgRef.current) {
         const x = currentX * -8;
         const y = currentY * -6;
         bgRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1.10)`;
       }
 
-      // Layer 1: Midground House - sits behind the foreground hill
+      // Layer 1: House
       if (houseRef.current) {
         const x = currentX * 7;
         const y = currentY * 5;
         houseRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1.06)`;
       }
 
-      // Layer 2: Foreground Hill - sits in front of house, lower-left
+      // Layer 2: Foreground Hill
       if (hillsRef.current) {
         const x = currentX * 18;
         const y = currentY * 12;
         hillsRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1.06)`;
       }
 
-      // Layer 3: Hero Foreground (Birch Tree) - strongest parallax depth
+      // Layer 3: Foreground Birch Tree
       if (treeRef.current) {
         const x = currentX * 28;
         const y = currentY * 16;
         treeRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1.06)`;
       }
 
-      // Layer 4: Floating Title & Text - subtle 2D parallax
+      // Layer 4: Text Content
       if (contentRef.current) {
         const x = currentX * 14;
         const y = currentY * 8;
@@ -117,7 +161,7 @@ export default function HeroParallax3D({
         container.removeEventListener("mouseleave", handleMouseLeave);
       }
     };
-  }, []);
+  }, [isStatic]);
 
   return (
     <section
@@ -125,18 +169,28 @@ export default function HeroParallax3D({
       className="relative h-[85vh] min-h-[580px] w-full overflow-hidden bg-neutral-950 select-none"
       style={{ perspective: "1000px" }}
     >
-      {/* 3D PARALLAX STACK */}
-      <div 
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        {/* Layer 0: Background (Sky & Lake) */}
-        <div
-          ref={bgRef}
-          className="absolute inset-0 w-full h-full will-change-transform transform-gpu"
+      {/* ADAPTIVE HERO VISUAL: STATIC ARTWORK OR 3D PARALLAX STACK */}
+      {isStatic ? (
+        <div className="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-700 ease-in-out">
+          <img
+            src={staticImageUrl}
+            alt="AvdeevART Original Artwork"
+            className="w-full h-full object-cover object-center"
+            loading="eager"
+            decoding="async"
+          />
+          <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+        </div>
+      ) : (
+        <div 
+          className="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-700 ease-in-out"
+          style={{ transformStyle: "preserve-3d" }}
         >
-          <picture>
-            <source srcSet="/images/hero/layers/layer_0_bg.webp" type="image/webp" />
+          {/* Layer 0: Background (Sky & Lake) */}
+          <div
+            ref={bgRef}
+            className="absolute inset-0 w-full h-full will-change-transform transform-gpu"
+          >
             <img
               src="/images/hero/layers/layer_0_bg.png"
               alt="Watercolor Sky and Lake Background"
@@ -144,16 +198,13 @@ export default function HeroParallax3D({
               loading="eager"
               decoding="async"
             />
-          </picture>
-        </div>
+          </div>
 
-        {/* Layer 1: Midground (House) */}
-        <div
-          ref={houseRef}
-          className="absolute inset-0 w-full h-full will-change-transform transform-gpu"
-        >
-          <picture>
-            <source srcSet="/images/hero/layers/layer_1_house.webp" type="image/webp" />
+          {/* Layer 1: Midground (House) */}
+          <div
+            ref={houseRef}
+            className="absolute inset-0 w-full h-full will-change-transform transform-gpu"
+          >
             <img
               src="/images/hero/layers/layer_1_house.png"
               alt="Watercolor Cottage"
@@ -161,16 +212,13 @@ export default function HeroParallax3D({
               loading="eager"
               decoding="async"
             />
-          </picture>
-        </div>
+          </div>
 
-        {/* Layer 2: Foreground Hill (Lower-Left in front of house) */}
-        <div
-          ref={hillsRef}
-          className="absolute inset-0 w-full h-full will-change-transform transform-gpu"
-        >
-          <picture>
-            <source srcSet="/images/hero/layers/layer_3_hills.webp" type="image/webp" />
+          {/* Layer 2: Foreground Hill (Lower-Left in front of house) */}
+          <div
+            ref={hillsRef}
+            className="absolute inset-0 w-full h-full will-change-transform transform-gpu"
+          >
             <img
               src="/images/hero/layers/layer_3_hills.png"
               alt="Watercolor Foreground Hill"
@@ -178,16 +226,13 @@ export default function HeroParallax3D({
               loading="eager"
               decoding="async"
             />
-          </picture>
-        </div>
+          </div>
 
-        {/* Layer 3: Hero Foreground (Birch Tree) */}
-        <div
-          ref={treeRef}
-          className="absolute inset-0 w-full h-full will-change-transform transform-gpu"
-        >
-          <picture>
-            <source srcSet="/images/hero/layers/layer_2_tree.webp" type="image/webp" />
+          {/* Layer 3: Hero Foreground (Birch Tree) */}
+          <div
+            ref={treeRef}
+            className="absolute inset-0 w-full h-full will-change-transform transform-gpu"
+          >
             <img
               src="/images/hero/layers/layer_2_tree.png"
               alt="Watercolor Birch Tree"
@@ -195,12 +240,12 @@ export default function HeroParallax3D({
               loading="eager"
               decoding="async"
             />
-          </picture>
-        </div>
+          </div>
 
-        {/* Darkening overlay matching original site (40% black) */}
-        <div className="absolute inset-0 bg-black/40 pointer-events-none" />
-      </div>
+          {/* Darkening overlay matching original site (40% black) */}
+          <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+        </div>
+      )}
 
       {/* FLOATING HERO CONTENT */}
       <div className="container relative mx-auto flex h-full flex-col items-center justify-center px-4 text-center text-white pointer-events-auto z-10">

@@ -30,6 +30,7 @@ export default function Home({ artworks, loading, artistInfo }: HomeProps) {
       <HeroParallax3D
         title="AvdeevART"
         subtitle={heroSubtitle}
+        staticImageUrl={heroBg || "/images/hero/hero_full_hires.jpg"}
         onExploreClick={() => {
           const portfolio = document.getElementById('portfolio');
           if (portfolio) {

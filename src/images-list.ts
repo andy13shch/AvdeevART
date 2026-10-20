@@ -2,6 +2,7 @@
 export const LOCAL_IMAGES = [
   "hero/FonPic.heic",
   "hero/hero_full.png",
+  "hero/hero_full_hires.jpg",
   "hero/layers/final_hero_preview.png",
   "hero/layers/layer_0_bg.png",
   "hero/layers/layer_0_bg.webp",
