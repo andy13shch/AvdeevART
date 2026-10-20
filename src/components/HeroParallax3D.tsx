@@ -29,12 +29,54 @@ export default function HeroParallax3D({
     return Boolean(isTouch && isSmallScreen);
   });
 
+  // Track when all 3D layers have been loaded to prevent black flashes
+  const [layersLoaded, setLayersLoaded] = useState(false);
+
   // Layer element references for direct GPU transforms
   const bgRef = useRef<HTMLDivElement>(null);
   const houseRef = useRef<HTMLDivElement>(null);
   const hillsRef = useRef<HTMLDivElement>(null);
   const treeRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  // Preload 3D layer images so they fade in together simultaneously
+  useEffect(() => {
+    if (isStatic) return;
+
+    let isMounted = true;
+    const layerUrls = [
+      "/images/hero/layers/layer_0_bg.webp",
+      "/images/hero/layers/layer_1_house.webp",
+      "/images/hero/layers/layer_2_tree.webp",
+    ];
+
+    let loadedCount = 0;
+    layerUrls.forEach((url) => {
+      const img = new Image();
+      img.src = url;
+      if (img.complete) {
+        loadedCount++;
+        if (loadedCount === layerUrls.length && isMounted) {
+          setLayersLoaded(true);
+        }
+      } else {
+        img.onload = () => {
+          loadedCount++;
+          if (loadedCount === layerUrls.length && isMounted) {
+            setLayersLoaded(true);
+          }
+        };
+        img.onerror = () => {
+          // If error loading WebP, fallback to static mode safely
+          if (isMounted) setIsStatic(true);
+        };
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isStatic]);
 
   useEffect(() => {
     if (isStatic) return;
@@ -169,21 +211,24 @@ export default function HeroParallax3D({
       className="relative h-[85vh] min-h-[580px] w-full overflow-hidden bg-neutral-950 select-none"
       style={{ perspective: "1000px" }}
     >
-      {/* ADAPTIVE HERO VISUAL: STATIC ARTWORK OR 3D PARALLAX STACK */}
-      {isStatic ? (
-        <div className="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-700 ease-in-out">
-          <img
-            src={staticImageUrl}
-            alt="AvdeevART Original Artwork"
-            className="w-full h-full object-cover object-center"
-            loading="eager"
-            decoding="async"
-          />
-          <div className="absolute inset-0 bg-black/40 pointer-events-none" />
-        </div>
-      ) : (
+      {/* 1. PERMANENT SOLID BACKDROP: Prevents any black gaps while 3D layers are streaming/decoding */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none">
+        <img
+          src={staticImageUrl}
+          alt="AvdeevART Hero Backdrop"
+          className="w-full h-full object-cover object-center"
+          loading="eager"
+          decoding="async"
+        />
+        <div className="absolute inset-0 bg-black/40 pointer-events-none" />
+      </div>
+
+      {/* 2. 3D PARALLAX STACK: Fades in seamlessly over the backdrop once all layers are ready */}
+      {!isStatic && (
         <div 
-          className="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-700 ease-in-out"
+          className={`absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-700 ease-in-out ${
+            layersLoaded ? "opacity-100" : "opacity-0"
+          }`}
           style={{ transformStyle: "preserve-3d" }}
         >
           {/* Layer 0: Background (Sky & Lake) */}
@@ -191,13 +236,16 @@ export default function HeroParallax3D({
             ref={bgRef}
             className="absolute inset-0 w-full h-full will-change-transform transform-gpu"
           >
-            <img
-              src="/images/hero/layers/layer_0_bg.png"
-              alt="Watercolor Sky and Lake Background"
-              className="w-full h-full object-cover object-center"
-              loading="eager"
-              decoding="async"
-            />
+            <picture>
+              <source srcSet="/images/hero/layers/layer_0_bg.webp" type="image/webp" />
+              <img
+                src="/images/hero/layers/layer_0_bg.png"
+                alt="Watercolor Sky and Lake Background"
+                className="w-full h-full object-cover object-center"
+                loading="eager"
+                decoding="async"
+              />
+            </picture>
           </div>
 
           {/* Layer 1: Midground (House) */}
@@ -205,13 +253,16 @@ export default function HeroParallax3D({
             ref={houseRef}
             className="absolute inset-0 w-full h-full will-change-transform transform-gpu"
           >
-            <img
-              src="/images/hero/layers/layer_1_house.png"
-              alt="Watercolor Cottage"
-              className="w-full h-full object-cover object-center"
-              loading="eager"
-              decoding="async"
-            />
+            <picture>
+              <source srcSet="/images/hero/layers/layer_1_house.webp" type="image/webp" />
+              <img
+                src="/images/hero/layers/layer_1_house.png"
+                alt="Watercolor Cottage"
+                className="w-full h-full object-cover object-center"
+                loading="eager"
+                decoding="async"
+              />
+            </picture>
           </div>
 
           {/* Layer 2: Foreground Hill (Lower-Left in front of house) */}
@@ -219,13 +270,16 @@ export default function HeroParallax3D({
             ref={hillsRef}
             className="absolute inset-0 w-full h-full will-change-transform transform-gpu"
           >
-            <img
-              src="/images/hero/layers/layer_3_hills.png"
-              alt="Watercolor Foreground Hill"
-              className="w-full h-full object-cover object-center"
-              loading="eager"
-              decoding="async"
-            />
+            <picture>
+              <source srcSet="/images/hero/layers/layer_3_hills.webp" type="image/webp" />
+              <img
+                src="/images/hero/layers/layer_3_hills.png"
+                alt="Watercolor Foreground Hill"
+                className="w-full h-full object-cover object-center"
+                loading="eager"
+                decoding="async"
+              />
+            </picture>
           </div>
 
           {/* Layer 3: Hero Foreground (Birch Tree) */}
@@ -233,13 +287,16 @@ export default function HeroParallax3D({
             ref={treeRef}
             className="absolute inset-0 w-full h-full will-change-transform transform-gpu"
           >
-            <img
-              src="/images/hero/layers/layer_2_tree.png"
-              alt="Watercolor Birch Tree"
-              className="w-full h-full object-cover object-center"
-              loading="eager"
-              decoding="async"
-            />
+            <picture>
+              <source srcSet="/images/hero/layers/layer_2_tree.webp" type="image/webp" />
+              <img
+                src="/images/hero/layers/layer_2_tree.png"
+                alt="Watercolor Birch Tree"
+                className="w-full h-full object-cover object-center"
+                loading="eager"
+                decoding="async"
+              />
+            </picture>
           </div>
 
           {/* Darkening overlay matching original site (40% black) */}
@@ -247,7 +304,7 @@ export default function HeroParallax3D({
         </div>
       )}
 
-      {/* FLOATING HERO CONTENT */}
+      {/* 3. FLOATING HERO CONTENT */}
       <div className="container relative mx-auto flex h-full flex-col items-center justify-center px-4 text-center text-white pointer-events-auto z-10">
         <div
           ref={contentRef}
