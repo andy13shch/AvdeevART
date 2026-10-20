@@ -208,7 +208,7 @@ export default function HeroParallax3D({
   return (
     <section
       ref={containerRef}
-      className="relative h-[85vh] min-h-[580px] w-full overflow-hidden bg-neutral-950 select-none"
+      className="relative h-[85vh] min-h-[520px] sm:min-h-[580px] w-full overflow-hidden bg-neutral-950 select-none"
       style={{ perspective: "1000px" }}
     >
       {/* 1. PERMANENT SOLID BACKDROP: Prevents any black gaps while 3D layers are streaming/decoding */}
@@ -314,7 +314,7 @@ export default function HeroParallax3D({
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-            className="font-serif text-4xl xs:text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter drop-shadow-2xl"
+            className="font-serif text-5xl xs:text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight drop-shadow-2xl"
           >
             {title}
           </motion.h1>
@@ -323,7 +323,7 @@ export default function HeroParallax3D({
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 1, ease: "easeOut", delay: 0.4 }}
-            className="mt-6 max-w-lg text-lg sm:text-xl text-white/90 drop-shadow-md"
+            className="mt-3 sm:mt-5 md:mt-6 max-w-[290px] xs:max-w-xs sm:max-w-md md:max-w-xl text-xs xs:text-sm sm:text-base md:text-lg text-white/85 font-light leading-relaxed tracking-wide drop-shadow-md"
           >
             {subtitle}
           </motion.p>
@@ -332,11 +332,11 @@ export default function HeroParallax3D({
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 1, ease: "easeOut", delay: 0.6 }}
-            className="mt-10 relative z-30 pointer-events-auto"
+            className="mt-5 sm:mt-8 md:mt-10 relative z-30 pointer-events-auto"
           >
             <button
               type="button"
-              className="cursor-pointer rounded-full px-8 py-4 text-base font-medium shadow-xl bg-neutral-900/90 text-white hover:bg-neutral-800 border border-white/20 transition-all hover:scale-105 active:scale-95 pointer-events-auto select-none"
+              className="cursor-pointer rounded-full px-5 py-2.5 sm:px-7 sm:py-3.5 text-xs sm:text-sm tracking-widest uppercase font-medium shadow-2xl bg-black/60 hover:bg-black/80 backdrop-blur-md text-white/95 hover:text-white border border-white/25 transition-all hover:scale-105 active:scale-95 pointer-events-auto select-none"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
