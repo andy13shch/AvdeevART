@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { HeicImage } from "@/components/HeicImage";
+import HeroParallax3D from "@/components/HeroParallax3D";
 
 interface HomeProps {
   artworks: Artwork[];
@@ -25,56 +26,18 @@ export default function Home({ artworks, loading, artistInfo }: HomeProps) {
 
   return (
     <div className="flex flex-col gap-24 pb-24">
-      {/* Hero Section */}
-      <section className="relative h-[80vh] w-full overflow-hidden bg-neutral-950">
-        {heroBg && (
-          <motion.div
-            initial={{ scale: 1.1, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1.5 }}
-            className="absolute inset-0"
-          >
-            <HeicImage
-              src={heroBg}
-              alt="Hero Background"
-              className="h-full w-full object-cover"
-              referrerPolicy="no-referrer"
-            />
-            <div className="absolute inset-0 bg-black/40" />
-          </motion.div>
-        )}
-        
-        <div className="container relative mx-auto flex h-full flex-col items-center justify-center px-4 text-center text-white">
-          <motion.h1
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="font-serif text-4xl xs:text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter"
-          >
-            AvdeevART
-          </motion.h1>
-          <motion.p
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="mt-6 max-w-lg text-lg text-white/80"
-          >
-            {heroSubtitle}
-          </motion.p>
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="mt-10"
-          >
-            <Button size="lg" className="rounded-full px-8" onClick={() => {
-              document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' });
-            }}>
-              Смотреть работы
-            </Button>
-          </motion.div>
-        </div>
-      </section>
+      {/* 3D Multiplane Parallax Hero Section */}
+      <HeroParallax3D
+        title="AvdeevART"
+        subtitle={heroSubtitle}
+        onExploreClick={() => {
+          const portfolio = document.getElementById('portfolio');
+          if (portfolio) {
+            const top = portfolio.getBoundingClientRect().top + window.pageYOffset - 20;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
+        }}
+      />
 
       <div id="portfolio" className="container mx-auto px-4">
         <motion.div
