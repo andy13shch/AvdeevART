@@ -105,7 +105,7 @@ export default function Admin({ artworks, artistInfo, user }: AdminProps) {
             </CardHeader>
             <CardContent className="flex justify-center pb-6 pt-2 px-6">
               <Button onClick={handleLogin} className="w-full gap-3 py-6 text-base sm:text-lg font-medium transition-all hover:scale-[1.02]">
-                <LogIn size={20} /> Войти через Google
+                <LogIn size={20} /> Вход
               </Button>
             </CardContent>
           </Card>
