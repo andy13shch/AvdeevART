@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { ArtistInfo } from "@/types";
-import { Save, User, Mail, Phone, Instagram, Send, Image as ImageIcon, RotateCcw, Shield, FolderOpen, Upload, Loader2 } from "lucide-react";
+import { Save, User, Mail, Phone, Send, Image as ImageIcon, RotateCcw, Shield, FolderOpen, Upload, Loader2 } from "lucide-react";
 import { updateArtistInfo } from "@/services/firebaseService";
 import { useState } from "react";
 import { processImageFile } from "@/lib/heicHelper";
@@ -58,7 +58,7 @@ const formSchema = z.object({
   bio: z.string().min(10, { message: "Биография должна содержать не менее 10 символов." }),
   email: z.string().email({ message: "Некорректный адрес электронной почты." }),
   phone: z.string().optional(),
-  instagram: z.string().optional(),
+  vk: z.string().optional(),
   telegram: z.string().optional(),
   profileImageUrl: z.string().refine((val) => {
     if (!val) return true;
@@ -142,7 +142,7 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
       bio: artistInfo.bio || "",
       email: artistInfo.email || "",
       phone: artistInfo.phone || "",
-      instagram: artistInfo.instagram || "",
+      vk: (artistInfo as any).vk || "",
       telegram: artistInfo.telegram || "",
       profileImageUrl: artistInfo.profileImageUrl || "",
       homeHeroBgUrl: artistInfo.homeHeroBgUrl || "",
@@ -498,14 +498,14 @@ export default function AdminArtistForm({ artistInfo }: AdminArtistFormProps) {
               />
               <FormField
                 control={form.control}
-                name="instagram"
+                name="vk"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex items-center gap-2">
-                      <Instagram size={14} /> Instagram URL
+                      VK (ВКонтакте) URL
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="https://instagram.com/vash_nik" {...field} />
+                      <Input placeholder="https://vk.com/vash_nik" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -86,7 +86,7 @@ service cloud.firestore {
 
     function isValidArtistInfo(data) {
       return hasOnlyAllowedFields([
-        'name', 'bio', 'email', 'phone', 'instagram', 'telegram', 'profileImageUrl',
+        'name', 'bio', 'email', 'phone', 'vk', 'instagram', 'telegram', 'profileImageUrl',
         'homeHeroBgUrl', 'homeHeroSubtitle', 'homePortfolioSubtitle',
         'emailjsServiceId', 'emailjsTemplateId', 'emailjsPublicKey'
       ]) &&
@@ -94,6 +94,7 @@ service cloud.firestore {
         data.bio is string && data.bio.size() >= 1 && data.bio.size() <= 10000 &&
         isValidEmail(data.email) &&
         (!('phone' in data) || (data.phone is string && data.phone.size() <= 100)) &&
+        (!('vk' in data) || (data.vk is string && data.vk.size() <= 300)) &&
         (!('instagram' in data) || (data.instagram is string && data.instagram.size() <= 300)) &&
         (!('telegram' in data) || (data.telegram is string && data.telegram.size() <= 300)) &&
         (!('profileImageUrl' in data) || (data.profileImageUrl == "" || isValidUrl(data.profileImageUrl))) &&

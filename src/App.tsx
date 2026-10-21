@@ -13,6 +13,7 @@ import "ldrs/react/Grid.css";
 const About = React.lazy(() => import("./pages/About"));
 const Contact = React.lazy(() => import("./pages/Contact"));
 const Admin = React.lazy(() => import("./pages/Admin"));
+const Privacy = React.lazy(() => import("./pages/Privacy"));
 
 function PageLoader() {
   return (
@@ -133,6 +134,14 @@ export default function App() {
             element={
               <Suspense fallback={<PageLoader />}>
                 <Admin artworks={artworks} artistInfo={artistInfo} user={user} />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/privacy"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <Privacy artistInfo={artistInfo} />
               </Suspense>
             }
           />

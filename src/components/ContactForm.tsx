@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -170,10 +171,19 @@ export default function ContactForm() {
               </FormItem>
             )}
           />
-          <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto px-12 gap-2">
-            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-            {isSubmitting ? "Отправка..." : "Отправить сообщение"}
-          </Button>
+          <div className="space-y-3 pt-2">
+            <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto px-12 gap-2 cursor-pointer">
+              {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isSubmitting ? "Отправка..." : "Отправить сообщение"}
+            </Button>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Нажимая кнопку «Отправить сообщение», вы даете согласие на обработку персональных данных в соответствии с{" "}
+              <Link to="/privacy" className="underline underline-offset-2 hover:text-foreground transition-colors">
+                Политикой конфиденциальности
+              </Link>
+              .
+            </p>
+          </div>
         </form>
       </Form>
     </motion.div>

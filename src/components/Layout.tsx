@@ -4,6 +4,7 @@ import Footer from "./Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { ArtistInfo } from "@/types";
 import ErrorBoundary from "./ErrorBoundary";
+import CookieBanner from "./CookieBanner";
 
 interface LayoutProps {
   artistInfo?: ArtistInfo;
@@ -19,6 +20,7 @@ export default function Layout({ artistInfo }: LayoutProps) {
         </ErrorBoundary>
       </main>
       <Footer artistInfo={artistInfo} />
+      <CookieBanner />
       <Toaster />
     </div>
   );

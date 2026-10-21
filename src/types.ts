@@ -13,7 +13,7 @@ export interface ArtistInfo {
   bio: string;
   email: string;
   phone?: string;
-  instagram?: string;
+  vk?: string;
   telegram?: string;
   profileImageUrl?: string;
   homeHeroBgUrl?: string;

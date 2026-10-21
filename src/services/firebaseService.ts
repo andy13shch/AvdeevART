@@ -106,7 +106,7 @@ export async function updateArtistInfo(info: ArtistInfo) {
 
   try {
     const allowedKeys = [
-      'name', 'bio', 'email', 'phone', 'instagram', 'telegram', 'profileImageUrl',
+      'name', 'bio', 'email', 'phone', 'vk', 'telegram', 'profileImageUrl',
       'homeHeroBgUrl', 'homeHeroSubtitle', 'homePortfolioSubtitle',
       'emailjsServiceId', 'emailjsTemplateId', 'emailjsPublicKey'
     ];
